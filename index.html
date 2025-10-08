@@ -202,11 +202,15 @@
         </div>
 
         <h1 class="text-3xl font-bold text-center text-black mb-4">Validador de JSON</h1>
+        <p class="text-center text-gray-800 mb-2">Esta herramienta valida la estructura de su archivo JSON, revisando campos obligatorios, tipos de datos y asignación de valores por defecto.</p>
         <p class="text-center text-gray-800 mb-6">Sube (o arrastra) un archivo .json para validar la estructura, tipos de datos y obtener un análisis.</p>
         
         <!-- Área de Drag and Drop -->
         <div id="drop-area" class="drop-area mb-6">
-            <p class="text-gray-500 dark:text-gray-400">Arrastra y suelta el archivo JSON aquí, o</p>
+            <!-- Contenido Dinámico aquí -->
+            <div id="file-name-display" class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p class="text-gray-500 dark:text-gray-400">Arrastra y suelta el archivo JSON aquí, o</p>
+            </div>
             <label for="json-file-input" class="inline-block text-sm font-semibold text-indigo-700 mt-2 cursor-pointer hover:underline">
                 Seleccionar archivo JSON
             </label>
@@ -224,7 +228,7 @@
         <!-- Contenedor de Botones de Acción -->
         <div id="action-buttons" class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-3 mb-6 hidden">
             <button id="correct-warnings-btn" class="bg-yellow-500 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-yellow-600 transition duration-150 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 102 0V7a1 1 0 10-2 0v3zm0 4a1 1 0 102 0v-1a1 1 0 10-2 0v1z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2300/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 102 0V7a1 1 0 10-2 0v3zm0 4a1 1 0 102 0v-1a1 1 0 10-2 0v1z" clip-rule="evenodd" /></svg>
                 Corregir Advertencias (Asignar Defaults)
             </button>
             <button id="download-json-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-indigo-700 transition duration-150 flex items-center justify-center">
@@ -252,8 +256,14 @@
             const correctWarningsBtn = document.getElementById('correct-warnings-btn');
             const downloadJsonBtn = document.getElementById('download-json-btn');
             const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const fileNameDisplay = document.getElementById('file-name-display'); // Nuevo elemento
 
             let currentParsedData = null; // Almacena el JSON válido para corrección/descarga
+            
+            // Texto de instrucción inicial
+            const initialDropText = '<p class="text-gray-500 dark:text-gray-400">Arrastra y suelta el archivo JSON aquí, o</p>';
+            fileNameDisplay.innerHTML = initialDropText;
+
 
             // --- Lógica de Modo Oscuro (NUEVO) ---
             const body = document.body;
@@ -685,6 +695,14 @@
 
 
             const processFile = (file) => {
+                // Mostrar nombre del archivo (SOLO NOMBRE)
+                if (file) {
+                    fileNameDisplay.innerHTML = `<span class="text-sm font-semibold text-gray-600 dark:text-gray-400">${file.name}</span>`;
+                } else {
+                    // Restablecer al texto inicial si no hay archivo
+                    fileNameDisplay.innerHTML = initialDropText;
+                }
+
                 if (!file) {
                     setStatusMessage('No se ha seleccionado ningún archivo.', 'text-gray-500');
                     jsonOutput.textContent = '';
