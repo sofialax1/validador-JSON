@@ -197,6 +197,39 @@
         .toggle-checkbox:checked + .toggle-label .toggle-thumb {
             transform: translateX(100%);
         }
+
+        /* Nuevas clases para los botones */
+        .analyze-btn {
+            background-color: #4f46e5; /* Indigo-600 */
+            color: white;
+            border: 1px solid #4f46e5;
+        }
+        .analyze-btn:hover {
+            background-color: #4338ca; /* Indigo-700 */
+        }
+        .reset-btn {
+            background-color: #ffffff; /* Blanco */
+            color: #4f46e5; /* Indigo-600 */
+            border: 1px solid #4f46e5; /* Indigo-600 */
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Transición para modo oscuro */
+        }
+        .reset-btn:hover {
+            background-color: #f3f4f6; /* Gray-100 */
+            color: #4338ca; /* Indigo-700 */
+            border-color: #4338ca;
+        }
+        
+        /* Estilos específicos del modo oscuro para el botón de Reiniciar */
+        .dark .reset-btn {
+            background-color: #2c2c2c; /* Fondo oscuro */
+            color: #93c5fd; /* Azul claro para el texto */
+            border-color: #3b82f6; /* Azul claro para el borde */
+        }
+        .dark .reset-btn:hover {
+            background-color: #3f3f46; /* Gris más oscuro al pasar el ratón */
+            color: #6366f1;
+            border-color: #6366f1;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-6">
@@ -209,28 +242,30 @@
                 <span class="block w-4 h-4 rounded-full bg-white absolute top-1 left-1 transition-transform transform toggle-thumb"></span>
             </label>
         </div>
-        
-        <h1 class="text-3xl font-bold text-center text-black mb-4">Validador de JSON</h1>
 
-        <!-- Nuevo Selector de Portal - Posicionado a la izquierda y arriba del drop area -->
-        <div class="flex items-center justify-start space-x-4 mb-6">
-            <label for="portal-select" class="text-sm font-medium text-gray-800 dark:text-gray-500">Portal:</label>
-            <select id="portal-select" class="block w-48 py-2 px-3 border border-gray-600 bg-white text-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-100 dark:border-gray-600 dark:text-dark">
-                <option value="" disabled selected>Seleccionar</option>
-                <option value="Urbania">Urbania</option>
-                <option value="Zonaprop">Zonaprop</option>
-                <option value="Plusvalia">Plusvalia</option>
-                <option value="Compreoalquile">Compreoalquile</option>
-                <option value="Inmuebles24">Inmuebles24</option>
-                <option value="Conlallave">Conlallave</option>
-            </select>
+        <h1 class="text-3xl font-bold text-center text-black mb-4">Validador de JSON</h1>
+        
+        <!-- Contenedor de Portal -->
+        <div class="flex justify-start items-center mb-6">
+            <!-- Selector de Portal -->
+            <div class="flex items-center space-x-4">
+                <label for="portal-select" class="text-sm font-medium text-gray-800 dark:text-gray-300">Portal:</label>
+                <select id="portal-select" class="block w-48 py-2 px-3 border border-gray-600 bg-white text-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-100 dark:border-gray-600 dark:text-dark">
+                    <option value="" disabled selected>Seleccionar</option>
+                    <option value="Urbania">Urbania</option>
+                    <option value="Zonaprop">Zonaprop</option>
+                    <option value="Plusvalia">Plusvalia</option>
+                    <option value="Compreoalquile">Compreoalquile</option>
+                    <option value="Inmuebles24">Inmuebles24</option>
+                </select>
+            </div>
         </div>
 
-         
-        <p class="text-center text-gray-800 mb-6">Sube (o arrastra) un archivo .json para validar la estructura, tipos de datos y obtener un análisis.</p>
+         <p class="text-center text-gray-800 mb-6">Sube (o arrastra) un archivo .json para validar la estructura, tipos de datos y obtener un análisis.</p>
+       
 
         <!-- Área de Drag and Drop -->
-        <div id="drop-area" class="drop-area mb-6">
+        <div id="drop-area" class="drop-area mb-3">
             <!-- Contenido Dinámico aquí -->
             <div id="file-name-display" class="text-sm font-medium text-gray-600 dark:text-gray-400">
                 <p class="text-gray-500 dark:text-gray-400">Arrastra y suelta el archivo JSON aquí, o</p>
@@ -241,6 +276,18 @@
             <input type="file" id="json-file-input" accept=".json" class="hidden">
         </div>
         
+        <!-- Botones de Acción de Carga y Reinicio (Nueva posición y centrado) -->
+        <div class="flex justify-center space-x-3 mb-6">
+            <!-- Botón Analizar Archivo -->
+            <button id="analyze-button" class="analyze-btn text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-indigo-700 transition duration-150 flex items-center justify-center text-sm">
+                Analizar Archivo
+            </button>
+            <!-- Botón de Reinicio -->
+            <button id="reset-button" class="reset-btn text-indigo-600 font-bold py-2 px-4 rounded-full shadow-md hover:bg-gray-100 transition duration-150 flex items-center justify-center text-sm">
+                Reiniciar
+            </button>
+        </div>
+        
         <div id="status-message" class="text-center font-medium mb-4 text-sm"></div>
 
         <!-- Resumen Ejecutivo -->
@@ -249,7 +296,7 @@
             <div id="analysis-summary" class="text-sm text-blue-700"></div>
         </div>
 
-        <!-- Contenedor de Botones de Acción -->
+        <!-- Contenedor de Botones de Acción (Corregir y Descargar) -->
         <div id="action-buttons" class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-3 mb-6 hidden">
             <button id="correct-warnings-btn" class="bg-yellow-500 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-yellow-600 transition duration-150 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2300/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 102 0V7a1 1 0 10-2 0v3zm0 4a1 1 0 102 0v-1a1 1 0 10-2 0v1z" clip-rule="evenodd" /></svg>
@@ -282,15 +329,19 @@
             const darkModeToggle = document.getElementById('dark-mode-toggle');
             const fileNameDisplay = document.getElementById('file-name-display'); // Nuevo elemento
             const portalSelect = document.getElementById('portal-select'); // Selector de portal
+            const resetButton = document.getElementById('reset-button'); // Botón de reinicio
+            const analyzeButton = document.getElementById('analyze-button'); // Botón de analizar
 
             let currentParsedData = null; // Almacena el JSON válido para corrección/descarga
+            let currentFile = null; // Almacena el archivo actual
+
             
             // Texto de instrucción inicial
             const initialDropText = '<p class="text-gray-500 dark:text-gray-400">Arrastra y suelta el archivo JSON aquí, o</p>';
             
             // --- CONSTANTES DE VALIDACIÓN ---
             
-            // Tipos de propiedad permitidos por portal (Se irá llenando con la info del usuario)
+            // Tipos de propiedad permitidos por portal (CLASIFICADOS)
             const PORTAL_ALLOWED_TYPES = {
                 "Zonaprop": [
                     "8", "2005", "10", "45", "7", "99", "32", "38", "5", "4", "26", "2", "2000", "1", "2001", "11", "14"
@@ -306,10 +357,26 @@
                 ],
                 "Plusvalia": [
                     "8", "10", "7", "32", "5", "4", "2", "1", "25", "6", "11", "9", "3"
-                ],
-                "Conlallave": [
-                    "8", "99", "38", "5", "4", "2", "1", "25", "6", "3", "55"
                 ]
+            };
+
+            // Tipos de propiedad permitidos por portal (EMPRENDIMIENTOS/DESARROLLO)
+            const PORTAL_ALLOWED_DEVELOPMENT_TYPES = {
+                "Zonaprop": [
+                    "33", "34" // Emprendimiento horizontal, Emprendimiento vertical
+                ],
+                "Urbania": [
+                    "33", "34" // Proyecto horizontal, Proyecto vertical
+                ],
+                "Inmuebles24": [
+                    "33", "34" // Desarrollo horizontal, Desarrollo vertical
+                ],
+                "Compreoalquile": [
+                    "33", "34" // Proyecto de casas, Proyecto de apartamentos
+                ], 
+                "Plusvalia": [
+                    "33", "34" // Proyecto horizontal, Proyecto vertical
+                ],
             };
 
             // Características con valor obligatorio (DEFAULT 0 en el campo 'valor')
@@ -334,11 +401,16 @@
                 statusMessage.className = `text-center font-medium mb-4 text-sm ${colorClass}`;
             }
 
-            // Función de ayuda para calcular el resumen (Punto 3a)
-            function calculateSummary(data) {
+            // Función de ayuda para determinar si un aviso es Desarrollo
+            function isDevelopmentAviso(data) {
                 const isDevelopmentByPubType = data.publicacion?.tipoDePublicacion === "Desarrollo" || data.publicacion?.tipoDePublicacion === "DEVELOPMENT";
                 const hasUnits = Array.isArray(data.unidades) && data.unidades.length > 0;
-                const isDevelopment = isDevelopmentByPubType || hasUnits; 
+                return isDevelopmentByPubType || hasUnits; 
+            }
+
+            // Función de ayuda para calcular el resumen (Punto 3a)
+            function calculateSummary(data) {
+                const isDevelopment = isDevelopmentAviso(data);
                 
                 const numUnits = isDevelopment && Array.isArray(data.unidades) ? data.unidades.length : 0; 
                 
@@ -592,6 +664,10 @@
                 if (!selectedPortal || selectedPortal === 'Seleccionar') {
                     errors.push("Debe seleccionar un Portal para validar las reglas específicas.");
                 }
+                
+                // Determinar si es un desarrollo para aplicar el conjunto correcto de IDs
+                const isDevelopment = isDevelopmentAviso(data);
+                const allowedTypesMap = isDevelopment ? PORTAL_ALLOWED_DEVELOPMENT_TYPES : PORTAL_ALLOWED_TYPES;
 
                 const requiredKeys = [
                     "descripcion",
@@ -616,7 +692,7 @@
                 if (!(data.titulo) || isValueEmpty(data.titulo)) {
                      publicacionTipoWarnings.push(`${prefix}El campo 'titulo' no existe o está vacío. El aviso podría aparecer sin título.`);
                 } else if (data.titulo && data.titulo.length > 100) {
-                    publicacionTipoWarnings.push(`${prefix}El campo 'titulo' tiene más de 100 caracteres. <span class="correction-text">Corrección:</span> Se truncará a 100 caracteres.`);
+                    publicacionTipoWarnings.push(`${prefix}El campo 'titulo' tiene más de 100 caracteres. <span class="correction-text">Corrección</span>: Se truncará a 100 caracteres.`);
                 }
 
 
@@ -626,12 +702,13 @@
                     
                     if (!('idTipo' in data.tipoDePropiedad) || isValueEmpty(idTipo)) {
                         errors.push(`${prefix}La clave obligatoria 'idTipo' dentro de 'tipoDePropiedad' no existe o está vacía.`);
-                    } else if (selectedPortal && PORTAL_ALLOWED_TYPES[selectedPortal]) {
-                        // NUEVA VALIDACIÓN: Tipo de Propiedad permitido por Portal
-                        // Se convierte a string para coincidir con la lista de IDs que son strings
-                        const allowedTypes = PORTAL_ALLOWED_TYPES[selectedPortal].map(String); 
-                        if (!allowedTypes.includes(String(idTipo))) {
-                            errors.push(`${prefix}El tipo de propiedad con ID '${idTipo}' no es válido para el portal '${selectedPortal}'.`);
+                    } else if (selectedPortal && allowedTypesMap[selectedPortal]) {
+                        // NUEVA VALIDACIÓN: Tipo de Propiedad (o Desarrollo) permitido por Portal
+                        const allowedTypes = allowedTypesMap[selectedPortal].map(String); 
+                        
+                        if (allowedTypes.length > 0 && !allowedTypes.includes(String(idTipo))) {
+                            const typeName = isDevelopment ? 'Tipo de Desarrollo' : 'Tipo de Propiedad';
+                            errors.push(`${prefix}El ${typeName} con ID '${idTipo}' no es válido para el portal '${selectedPortal}'.`);
                         }
                     }
                     
@@ -669,7 +746,7 @@
                     }
                     // Advertencia: emailAsesor vacío (Agrupación 3)
                     if (!('emailAsesor' in data.publicador) || isValueEmpty(data.publicador.emailAsesor)) {
-                        publicacionTipoWarnings.push(`${prefix}El campo 'emailAsesor' en 'publicador' está vacío. <span class="correction-text">Corrección:</span> Se asignará 'Administrador' por defecto.`);
+                        publicacionTipoWarnings.push(`${prefix}El campo 'emailAsesor' en 'publicador' está vacío. <span class="correction-text">Corrección</span>: Se asignará 'Administrador' por defecto.`);
                     }
                 } else {
                     errors.push(`${prefix}La clave obligatoria 'publicador' no existe.`);
@@ -677,7 +754,7 @@
 
                 // Advertencia: tipoDePublicacion vacío (Agrupación 3)
                 if (data.publicacion && 'tipoDePublicacion' in data.publicacion && isValueEmpty(data.publicacion.tipoDePublicacion)) {
-                    publicacionTipoWarnings.push(`${prefix}El campo 'tipoDePublicacion' está vacío. <span class="correction-text">Corrección:</span> Se asignará por defecto el valor 'SIMPLE'.`);
+                    publicacionTipoWarnings.push(`${prefix}El campo 'tipoDePublicacion' está vacío. <span class="correction-text">Corrección</span>: Se asignará por defecto el valor 'SIMPLE'.`);
                 }
                 
                 
@@ -700,7 +777,7 @@
                         // WARNING: idValor no obligatorio (Agrupación 1 - Warnings)
                         if (!('idValor' in caracteristica) || isValueEmpty(caracteristica.idValor)) {
                              const nombreCaracteristica = caracteristica.nombre || `Sin nombre (Índice ${index + 1})`;
-                             caracteristicasWarnings.push(`${prefix}La característica '${nombreCaracteristica}' no tiene 'idValor'. <span class="correction-text">Corrección:</span> Se asignará '0' como valor por defecto.`);
+                             caracteristicasWarnings.push(`${prefix}La característica '${nombreCaracteristica}' no tiene 'idValor'. <span class="correction-text">Corrección</span>: Se asignará '0' como valor por defecto.`);
                         }
                     });
                     
@@ -711,7 +788,7 @@
                         // NOTA: ELIMINACIÓN DE LA PARTE ENTRE PARÉNTESIS
                         if (!char || isValueEmpty(char.valor)) {
                             // Generar la advertencia específica (Mensaje simplificado)
-                            mandatoryValueWarnings.push(`${prefix}La característica '${requiredName}' no tiene un valor. <span class="correction-text">Corrección:</span> Se asignará '0' como valor default.`);
+                            mandatoryValueWarnings.push(`${prefix}La característica '${requiredName}' no tiene un valor. <span class="correction-text">Corrección</span>: Se asignará '0' como valor default.`);
                         }
                     }
 
@@ -735,7 +812,7 @@
                         }
                         // Advertencia para moneda
                         if (!('moneda' in price) || isValueEmpty(price.moneda)) {
-                            warnings.push(`${prefix}El campo 'moneda' está vacío. <span class="correction-text">Corrección:</span> Se asignará la moneda default.`);
+                            warnings.push(`${prefix}El campo 'moneda' está vacío. <span class="correction-text">Corrección</span>: Se asignará la moneda default.`);
                         }
                     });
                 }
@@ -749,6 +826,13 @@
                     // Advertencia por falta de imágenes (ya existía)
                     if (!data.multimedia.imagenes || (Array.isArray(data.multimedia.imagenes) && data.multimedia.imagenes.length === 0)) {
                         multimediaUbicacionWarnings.push(`El aviso no cuenta con imágenes.`);
+                    }
+                }
+                
+                // VALIDACIÓN EXTRA: Campos obligatorios de Desarrollo (solo si se detecta desarrollo)
+                if (isDevelopment && !isUnit) {
+                    if (!('fechaEntrega' in data) || isValueEmpty(data.fechaEntrega)) {
+                        errors.push("El tipo de publicación es 'Emprendimiento/Desarrollo' pero el campo 'fechaEntrega' no existe o está vacío.");
                     }
                 }
                 
@@ -882,33 +966,58 @@
                 const dt = e.dataTransfer;
                 const files = dt.files;
                 if (files.length) {
-                    // Simula la selección manual del archivo para mantener la lógica existente
-                    jsonFileInput.files = files;
-                    jsonFileInput.dispatchEvent(new Event('change'));
+                    // Al arrastrar, almacenamos el archivo y actualizamos el display, pero NO analizamos
+                    currentFile = files[0];
+                    updateFileDisplay(currentFile.name);
                 }
             }
             // --- Fin Lógica de Drag and Drop ---
+
+            // --- Lógica de Reinicio (ACTUALIZADA) ---
+            function resetApplication() {
+                currentParsedData = null;
+                currentFile = null;
+                jsonOutput.textContent = '';
+                statusMessage.innerHTML = '';
+                summarySection.classList.add('hidden');
+                actionButtons.classList.add('hidden');
+                portalSelect.value = 'Seleccionar'; // Restablecer el desplegable
+                
+                // Restablecer el área de drop al texto inicial y ocultar el botón de analizar
+                fileNameDisplay.innerHTML = initialDropText;
+                jsonFileInput.value = ''; 
+                dropArea.classList.remove('highlight');
+                // analyzeButton.classList.remove('hidden'); // Ya no es necesario
+            }
+
+            resetButton.addEventListener('click', resetApplication);
+            
+            // Función para actualizar la visualización del archivo cargado/arrastrado
+            function updateFileDisplay(fileName) {
+                fileNameDisplay.innerHTML = `<span class="text-sm font-semibold text-gray-600 dark:text-gray-400">${fileName}</span>`;
+                // analyzeButton.classList.remove('hidden'); // Ya no se oculta/muestra, es siempre visible
+            }
+            // --- Fin Lógica de Reinicio ---
 
 
             const processFile = (file) => {
                 // Obtener el portal seleccionado antes de procesar
                 const selectedPortal = portalSelect.value;
                 
-                // Mostrar nombre del archivo (SOLO NOMBRE)
-                if (file) {
-                    fileNameDisplay.innerHTML = `<span class="text-sm font-semibold text-gray-600 dark:text-gray-400">${file.name}</span>`;
-                } else {
-                    // Restablecer al texto inicial si no hay archivo
-                    fileNameDisplay.innerHTML = initialDropText;
-                }
-
+                // Esta función ahora solo se llama al hacer clic en ANALIZAR
                 if (!file) {
-                    setStatusMessage('No se ha seleccionado ningún archivo.', 'text-gray-500');
-                    jsonOutput.textContent = '';
-                    actionButtons.classList.add('hidden');
-                    summarySection.classList.add('hidden');
+                    setStatusMessage('Error: No se ha seleccionado ningún archivo para analizar.', 'text-red-600');
                     return;
                 }
+
+                if (selectedPortal === 'Seleccionar' || !selectedPortal) {
+                     setStatusMessage('Error: Por favor, seleccione un Portal de destino.', 'text-red-600');
+                     jsonOutput.textContent = '';
+                     actionButtons.classList.add('hidden');
+                     summarySection.classList.add('hidden');
+                     return;
+                }
+
 
                 if (file.type !== 'application/json') {
                     setStatusMessage('Error: Por favor, sube un archivo .json válido.', 'text-red-600');
@@ -932,15 +1041,15 @@
                     try {
                         let parsedData = JSON.parse(fileContent);
 
-                        const primaryResult = validateJSON(parsedData, false, null, selectedPortal);
+                        const primaryResult = validateJSON(parsedData, false, null);
                         
-                        // Define isDevelopment based on EITHER pub type OR units presence (FIX)
+                        // Define isDevelopment para el procesamiento de unidades
+                        const isDevelopment = isDevelopmentAviso(parsedData);
                         const isDevelopmentByPubType = parsedData.publicacion?.tipoDePublicacion === "Desarrollo" || parsedData.publicacion?.tipoDePublicacion === "DEVELOPMENT";
-                        const hasUnits = Array.isArray(parsedData.unidades) && parsedData.unidades.length > 0;
-                        const isDevelopment = isDevelopmentByPubType || hasUnits; // Definición ampliada
+
 
                         // NEW WARNING: Si hay unidades pero el tipo de publicación no está marcado como Desarrollo (Inferencia)
-                        if (hasUnits && !isDevelopmentByPubType) {
+                        if (isDevelopmentAviso(parsedData) && !isDevelopmentByPubType) {
                             generalWarnings.push("ADVERTENCIA DE INFERENCIA: El archivo contiene 'unidades', pero el campo 'tipoDePublicacion' no está en 'Desarrollo' o 'DEVELOPMENT'. La validación se ejecutará como Emprendimiento, pero se recomienda corregir el campo 'tipoDePublicacion'.");
                         }
 
@@ -952,18 +1061,16 @@
                         generalWarnings = generalWarnings.concat(primaryResult.warnings.filter(w => typeof w === 'string'));
                         groupedWarnings = groupedWarnings.concat(primaryResult.warnings.filter(w => typeof w === 'object'));
 
-                        // Validación para tipo de publicación 'Desarrollo' (usa la definición ampliada)
+                        // Validación para tipo de publicación 'Desarrollo'
                         if (isDevelopment) {
                             if (!('unidades' in parsedData) || !Array.isArray(parsedData.unidades) || parsedData.unidades.length === 0) {
-                                // Este error solo debería ocurrir si hasUnits es falso, pero isDevelopment es true (lo cual es redundante, but keeps the array empty check)
                                 allErrors.push("El tipo de publicación es 'Emprendimiento/Desarrollo' pero el array 'unidades' está vacío.");
                             } else {
                                 if (!('fechaEntrega' in parsedData) || isValueEmpty(parsedData.fechaEntrega)) {
                                     allErrors.push("El tipo de publicación es 'Emprendimiento/Desarrollo' pero el campo 'fechaEntrega' no existe o está vacío.");
                                 }
                                 parsedData.unidades.forEach((unit, index) => {
-                                    // Pasa el portal seleccionado a la validación de unidades
-                                    const unitResult = validateJSON(unit, true, index, selectedPortal);
+                                    const unitResult = validateJSON(unit, true, index);
                                     
                                     // Concatenar resultados de unidad
                                     allErrors = allErrors.concat(unitResult.errors.filter(e => typeof e === 'string'));
@@ -1071,7 +1178,9 @@
                             if (allErrors.length > 0 || groupedErrors.length > 0) {
                                 setStatusMessage(message, 'text-left'); // Se retira colorClass ya que el color lo maneja el box
                                 // El JSON se muestra arriba gracias a highlightJSON
-                                actionButtons.classList.add('hidden');
+                                actionButtons.classList.remove('hidden'); // Mostrar botones (Corregir/Descargar)
+                                correctWarningsBtn.classList.add('hidden'); // Ocultar Corregir si hay errores
+                                downloadJsonBtn.classList.add('hidden'); // Ocultar Descargar si hay errores
                             } else {
                                 setStatusMessage(message, 'text-left');
                                 currentParsedData = parsedData;
@@ -1100,9 +1209,30 @@
                 };
                 reader.readAsText(file);
             };
+            
+            // --- EVENT LISTENERS PRINCIPALES ---
 
+            // Listener para cuando se selecciona un archivo (maneja el file input)
             jsonFileInput.addEventListener('change', (event) => {
-                processFile(event.target.files[0]);
+                currentFile = event.target.files[0];
+                if (currentFile) {
+                    updateFileDisplay(currentFile.name);
+                }
+            });
+            
+            // Listener para el nuevo botón Analizar Archivo
+            analyzeButton.addEventListener('click', () => {
+                // Reiniciar el área de output antes de analizar para evitar confusión
+                jsonOutput.textContent = '';
+                summarySection.classList.add('hidden');
+                actionButtons.classList.add('hidden');
+                
+                // Si el archivo no está guardado (caso de click sin drop previo), intentar obtenerlo del input
+                if (!currentFile && jsonFileInput.files.length > 0) {
+                     currentFile = jsonFileInput.files[0];
+                }
+                
+                processFile(currentFile);
             });
 
 
@@ -1172,7 +1302,7 @@
                 }
 
                 // 7. Aplicar correcciones a unidades si es Desarrollo
-                const isDevelopment = data.publicacion?.tipoDePublicacion === "Desarrollo" || data.publicacion?.tipoDePublicacion === "DEVELOPMENT";
+                const isDevelopment = isDevelopmentAviso(data);
                 if (isDevelopment && Array.isArray(data.unidades)) {
                     data.unidades.forEach(unit => applyCorrections(unit));
                 }
@@ -1185,8 +1315,8 @@
                     const correctedData = applyCorrections(JSON.parse(JSON.stringify(currentParsedData))); // Clonar para modificar
                     
                     // Volver a validar para confirmar que las advertencias desaparecieron
-                    const validationResult = validateJSON(correctedData, false, null, portalSelect.value);
-                    
+                    const validationResult = validateJSON(JSON.parse(JSON.stringify(correctedData)), false, null); // Clonar nuevamente para validar
+
                     if (validationResult.errors.length > 0) {
                          // Esto no debería pasar si las correcciones son correctas, pero es un fallback
                          setStatusMessage('Error: La corrección automática introdujo o no resolvió errores críticos.', 'text-red-600');
@@ -1198,7 +1328,8 @@
                     } else {
                         // Si quedan advertencias (las que no tienen corrección auto), simplemente actualizar
                         currentParsedData = correctedData;
-                        jsonOutput.textContent = JSON.stringify(currentParsedData, null, 2);
+                        // Forzar el proceso completo para re-renderizar el JSON resaltado y el nuevo reporte de advertencias
+                        processFile(new File([JSON.stringify(currentParsedData)], 'archivo_corregido.json', { type: 'application/json' }));
                         setStatusMessage('Advertencias corregidas. Aún quedan advertencias informativas (sin corrección automática).', 'text-yellow-600');
                     }
                 }
