@@ -209,10 +209,26 @@
                 <span class="block w-4 h-4 rounded-full bg-white absolute top-1 left-1 transition-transform transform toggle-thumb"></span>
             </label>
         </div>
-
-        <h1 class="text-3xl font-bold text-center text-black mb-4">Validador de JSON</h1>
-        <p class="text-center text-gray-800 mb-6">Sube (o arrastra) un archivo .json para validar la estructura, tipos de datos y obtener un análisis.</p>
         
+        <h1 class="text-3xl font-bold text-center text-black mb-4">Validador de JSON</h1>
+
+        <!-- Nuevo Selector de Portal - Posicionado a la izquierda y arriba del drop area -->
+        <div class="flex items-center justify-start space-x-4 mb-6">
+            <label for="portal-select" class="text-sm font-medium text-gray-800 dark:text-gray-500">Portal:</label>
+            <select id="portal-select" class="block w-48 py-2 px-3 border border-gray-600 bg-white text-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-100 dark:border-gray-600 dark:text-dark">
+                <option value="" disabled selected>Seleccionar</option>
+                <option value="Urbania">Urbania</option>
+                <option value="Zonaprop">Zonaprop</option>
+                <option value="Plusvalia">Plusvalia</option>
+                <option value="Compreoalquile">Compreoalquile</option>
+                <option value="Inmuebles24">Inmuebles24</option>
+                <option value="Conlallave">Conlallave</option>
+            </select>
+        </div>
+
+         
+        <p class="text-center text-gray-800 mb-6">Sube (o arrastra) un archivo .json para validar la estructura, tipos de datos y obtener un análisis.</p>
+
         <!-- Área de Drag and Drop -->
         <div id="drop-area" class="drop-area mb-6">
             <!-- Contenido Dinámico aquí -->
@@ -240,14 +256,14 @@
                 Corregir Advertencias (Asignar Defaults)
             </button>
             <button id="download-json-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-indigo-700 transition duration-150 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L10 11.586l1.293-1.293a1 1 0 111.414 1.414l-2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v10a1 1 0 11-2 0V3a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2300/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L10 11.586l1.293-1.293a1 1 0 111.414 1.414l-2 2a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z" clip-rule="evenodd" /><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v10a1 1 0 11-2 0V3a1 1 0 011-1z" clip-rule="evenodd" /></svg>
                 Descargar JSON Corregido (.json)
             </button>
         </div>
 
 
         <div class="bg-gray-50 p-4 rounded-lg">
-            <h2 class="text-lg font-semibold text-gray-600 mb-2 dark:text-gray-500">Contenido del Archivo:</h2>
+            <h2 class="text-lg font-semibold text-black mb-2 dark:text-gray600">Contenido del Archivo:</h2>
             <pre id="json-output"></pre>
         </div>
     </div>
@@ -265,11 +281,47 @@
             const downloadJsonBtn = document.getElementById('download-json-btn');
             const darkModeToggle = document.getElementById('dark-mode-toggle');
             const fileNameDisplay = document.getElementById('file-name-display'); // Nuevo elemento
+            const portalSelect = document.getElementById('portal-select'); // Selector de portal
 
             let currentParsedData = null; // Almacena el JSON válido para corrección/descarga
             
             // Texto de instrucción inicial
             const initialDropText = '<p class="text-gray-500 dark:text-gray-400">Arrastra y suelta el archivo JSON aquí, o</p>';
+            
+            // --- CONSTANTES DE VALIDACIÓN ---
+            
+            // Tipos de propiedad permitidos por portal (Se irá llenando con la info del usuario)
+            const PORTAL_ALLOWED_TYPES = {
+                "Zonaprop": [
+                    "8", "2005", "10", "45", "7", "99", "32", "38", "5", "4", "26", "2", "2000", "1", "2001", "11", "14"
+                ],
+                "Urbania": [
+                    "32", "38", "5", "22", "4", "26", "2", "1", "28", "27", "25", "29", "3"
+                ],
+                "Inmuebles24": [
+                    "21", "16", "7", "17", "18", "5", "19", "22", "4", "20", "24", "2", "1", "12", "13", "101", "11", "14", "3", "15"
+                ],
+                "Compreoalquile": [
+                    "8", "10", "7", "38", "5", "4", "2", "1", "25", "6", "46", "44", "3"
+                ],
+                "Plusvalia": [
+                    "8", "10", "7", "32", "5", "4", "2", "1", "25", "6", "11", "9", "3"
+                ],
+                "Conlallave": [
+                    "8", "99", "38", "5", "4", "2", "1", "25", "6", "3", "55"
+                ]
+            };
+
+            // Características con valor obligatorio (DEFAULT 0 en el campo 'valor')
+            const MANDATORY_VALUE_CHARACTERISTICS = [
+                "PRINCIPALES|GARAGE", 
+                "PRINCIPALES|HABITACIONES", 
+                "PRINCIPALES|MEDIOS_BANOS", 
+                "MEDIDAS|SUPERFICIE_CUBIERTA", 
+                "MEDIDAS|SUPERFICIE_TOTAL"
+            ];
+            // ----------------------------------------------------------------------
+
 
             // --- Funciones Auxiliares (Declaraciones para asegurar Hoisting) ---
 
@@ -300,6 +352,7 @@
                 };
 
                 let summary = `
+                    <p><strong>Portal Seleccionado:</strong> ${portalSelect.value}</p>
                     <p><strong>Tipo de Aviso:</strong> ${tipoAviso}</p>
                     <p><strong>Plan de Publicación:</strong> ${data.publicacion?.tipoDePublicacion || 'SIMPLE (Default)'}</p>
                     ${isDevelopment ? `<p><strong>Unidades Validadas:</strong> ${numUnits}</p>` : ''}
@@ -357,6 +410,11 @@
                     }
                     if (msg.includes("idUbicacion' contiene letras minúsculas")) {
                         keys.push('idUbicacion'); 
+                    }
+                    // Nuevo caso de error: Tipo de Propiedad no permitido
+                    if (msg.includes("tipo de propiedad no es válido")) {
+                        keys.push('tipoDePropiedad'); 
+                        keys.push('idTipo');
                     }
                 });
                 
@@ -468,7 +526,7 @@
                 });
             }
 
-            // --- VALIDACION DE TIPOS (Función con corrección de hoisting) ---
+            // --- VALIDACION DE TIPOS ---
             function validateTypes(data, schema, path = '') {
                 const warnings = [];
 
@@ -494,8 +552,8 @@
                                     }
                                 }
                             }
-                        } else if (actualType === 'object' && typeof schema[key] === 'object' && !Array.isArray(schema[key])) {
-                            // CORRECCIÓN DE TYPO: 'ArrayOf' cambiado a 'Array.isArray'
+                        } else if (actualType === 'object' && typeof schema[key] === 'object' && !ArrayOf(schema[key])) {
+                            // Si el esquema es un objeto, seguir recursión
                             warnings.push(...validateTypes(data[key], schema[key], currentPath));
                         } else if (actualType === 'array' && Array.isArray(data[key])) {
                             if (data[key].length > 0) {
@@ -509,12 +567,18 @@
                 }
                 return warnings;
             }
+            
+            // Función de ayuda para determinar si un valor de esquema es un array, evitando confusiones con Object
+            function ArrayOf(val) {
+                return Array.isArray(val) && val.length > 0 && typeof val[0] === 'object';
+            }
 
-            // --- VALIDACION PRINCIPAL (Función con corrección de hoisting) ---
+            // --- VALIDACION PRINCIPAL ---
             function validateJSON(data, isUnit = false, unitIndex = null) {
                 const errors = [];
                 const warnings = [];
                 const caracteristicasWarnings = [];
+                const mandatoryValueWarnings = []; // NUEVO: Caracteristicas con valor obligatorio
                 const multimediaUbicacionWarnings = []; // Agrupación 2
                 const publicacionTipoWarnings = []; // Agrupación 3
                 
@@ -522,6 +586,12 @@
                 const preciosErrors = []; // Errores agrupados de precios
 
                 const prefix = isUnit ? `Unidad ${unitIndex + 1}: ` : '';
+
+                // Obtener el portal seleccionado para futuras validaciones condicionales
+                const selectedPortal = portalSelect.value;
+                if (!selectedPortal || selectedPortal === 'Seleccionar') {
+                    errors.push("Debe seleccionar un Portal para validar las reglas específicas.");
+                }
 
                 const requiredKeys = [
                     "descripcion",
@@ -552,9 +622,19 @@
 
                 // Validar campos anidados (Errores No Agrupados)
                 if (data.tipoDePropiedad) {
-                    if (!('idTipo' in data.tipoDePropiedad) || isValueEmpty(data.tipoDePropiedad.idTipo)) {
+                    const idTipo = data.tipoDePropiedad.idTipo;
+                    
+                    if (!('idTipo' in data.tipoDePropiedad) || isValueEmpty(idTipo)) {
                         errors.push(`${prefix}La clave obligatoria 'idTipo' dentro de 'tipoDePropiedad' no existe o está vacía.`);
+                    } else if (selectedPortal && PORTAL_ALLOWED_TYPES[selectedPortal]) {
+                        // NUEVA VALIDACIÓN: Tipo de Propiedad permitido por Portal
+                        // Se convierte a string para coincidir con la lista de IDs que son strings
+                        const allowedTypes = PORTAL_ALLOWED_TYPES[selectedPortal].map(String); 
+                        if (!allowedTypes.includes(String(idTipo))) {
+                            errors.push(`${prefix}El tipo de propiedad con ID '${idTipo}' no es válido para el portal '${selectedPortal}'.`);
+                        }
                     }
+                    
                 } else {
                     errors.push(`${prefix}La clave obligatoria 'tipoDePropiedad' no existe.`);
                 }
@@ -603,6 +683,14 @@
                 
                 // Validar caracteristicas (Agrupación 1 - Warnings y Errores)
                 if (data.caracteristicas && Array.isArray(data.caracteristicas)) {
+                    const existingCharMap = new Map();
+                    data.caracteristicas.forEach(c => {
+                        if (c.nombre) {
+                            existingCharMap.set(c.nombre, c);
+                        }
+                    });
+
+                    // 1. Validar CARACTERÍSTICAS OBLIGATORIAS (ERROR: nombre, WARNING: idValor)
                     data.caracteristicas.forEach((caracteristica, index) => {
                         // ERROR: Nombre obligatorio (Agrupación de Errores)
                         if (!('nombre' in caracteristica) || isValueEmpty(caracteristica.nombre)) {
@@ -615,6 +703,18 @@
                              caracteristicasWarnings.push(`${prefix}La característica '${nombreCaracteristica}' no tiene 'idValor'. <span class="correction-text">Corrección:</span> Se asignará '0' como valor por defecto.`);
                         }
                     });
+                    
+                    // 2. NUEVA VALIDACIÓN: Características con Valor Obligatorio (Default 0 en 'valor')
+                    for (const requiredName of MANDATORY_VALUE_CHARACTERISTICS) {
+                        const char = existingCharMap.get(requiredName);
+                        
+                        // NOTA: ELIMINACIÓN DE LA PARTE ENTRE PARÉNTESIS
+                        if (!char || isValueEmpty(char.valor)) {
+                            // Generar la advertencia específica (Mensaje simplificado)
+                            mandatoryValueWarnings.push(`${prefix}La característica '${requiredName}' no tiene un valor. <span class="correction-text">Corrección:</span> Se asignará '0' como valor default.`);
+                        }
+                    }
+
                 }
 
 
@@ -678,6 +778,16 @@
                 // --- Ensamblar Warnings Agrupados ---
                 
                 const groupedWarnings = [];
+                
+                // 4. Caracteristicas con Valor Obligatorio (NUEVA AGRUPACIÓN)
+                if (mandatoryValueWarnings.length > 0) {
+                    groupedWarnings.push({
+                        title: `Características con Valor Obligatorio (Asignación Default: 0)`,
+                        items: mandatoryValueWarnings,
+                        type: 'warnings'
+                    });
+                }
+
 
                 // 3. Publicación y Tipos
                 if (publicacionTipoWarnings.length > 0) {
@@ -697,7 +807,7 @@
                     });
                 }
                 
-                // 1. Características
+                // 1. Características (idValor)
                 if (caracteristicasWarnings.length > 0) {
                     groupedWarnings.push({
                         title: `Características (idValor)`,
@@ -781,6 +891,9 @@
 
 
             const processFile = (file) => {
+                // Obtener el portal seleccionado antes de procesar
+                const selectedPortal = portalSelect.value;
+                
                 // Mostrar nombre del archivo (SOLO NOMBRE)
                 if (file) {
                     fileNameDisplay.innerHTML = `<span class="text-sm font-semibold text-gray-600 dark:text-gray-400">${file.name}</span>`;
@@ -819,7 +932,7 @@
                     try {
                         let parsedData = JSON.parse(fileContent);
 
-                        const primaryResult = validateJSON(parsedData);
+                        const primaryResult = validateJSON(parsedData, false, null, selectedPortal);
                         
                         // Define isDevelopment based on EITHER pub type OR units presence (FIX)
                         const isDevelopmentByPubType = parsedData.publicacion?.tipoDePublicacion === "Desarrollo" || parsedData.publicacion?.tipoDePublicacion === "DEVELOPMENT";
@@ -836,27 +949,43 @@
                         allErrors = primaryResult.errors.filter(e => typeof e === 'string');
                         groupedErrors = primaryResult.errors.filter(e => typeof e === 'object');
                         
-                        generalWarnings = primaryResult.warnings.filter(w => typeof w === 'string');
-                        groupedWarnings = primaryResult.warnings.filter(w => typeof w === 'object');
+                        generalWarnings = generalWarnings.concat(primaryResult.warnings.filter(w => typeof w === 'string'));
+                        groupedWarnings = groupedWarnings.concat(primaryResult.warnings.filter(w => typeof w === 'object'));
 
                         // Validación para tipo de publicación 'Desarrollo' (usa la definición ampliada)
                         if (isDevelopment) {
                             if (!('unidades' in parsedData) || !Array.isArray(parsedData.unidades) || parsedData.unidades.length === 0) {
-                                // Este error solo debería ocurrir si hasUnits es falso, pero isDevelopment es true (lo cual es redundante, pero mantiene el check de array vacío)
+                                // Este error solo debería ocurrir si hasUnits es falso, pero isDevelopment es true (lo cual es redundante, but keeps the array empty check)
                                 allErrors.push("El tipo de publicación es 'Emprendimiento/Desarrollo' pero el array 'unidades' está vacío.");
                             } else {
                                 if (!('fechaEntrega' in parsedData) || isValueEmpty(parsedData.fechaEntrega)) {
                                     allErrors.push("El tipo de publicación es 'Emprendimiento/Desarrollo' pero el campo 'fechaEntrega' no existe o está vacío.");
                                 }
                                 parsedData.unidades.forEach((unit, index) => {
-                                    const unitResult = validateJSON(unit, true, index);
+                                    // Pasa el portal seleccionado a la validación de unidades
+                                    const unitResult = validateJSON(unit, true, index, selectedPortal);
                                     
                                     // Concatenar resultados de unidad
                                     allErrors = allErrors.concat(unitResult.errors.filter(e => typeof e === 'string'));
-                                    groupedErrors = groupedErrors.concat(unitResult.errors.filter(e => typeof e === 'object'));
                                     
+                                    // Concatenar errores agrupados de la unidad
+                                    const unitGroupedErrors = unitResult.errors.filter(e => typeof e === 'object');
+                                    // Agregar prefijo de unidad a los títulos de los errores agrupados
+                                    unitGroupedErrors.forEach(group => {
+                                        group.title = `Unidad ${index + 1}: ${group.title}`;
+                                    });
+                                    groupedErrors = groupedErrors.concat(unitGroupedErrors);
+                                    
+                                    // Concatenar warnings
                                     generalWarnings = generalWarnings.concat(unitResult.warnings.filter(w => typeof w === 'string'));
-                                    groupedWarnings = groupedWarnings.concat(unitResult.warnings.filter(w => typeof w === 'object'));
+                                    
+                                    // Concatenar warnings agrupados de la unidad
+                                    const unitGroupedWarnings = unitResult.warnings.filter(w => typeof w === 'object');
+                                     // Agregar prefijo de unidad a los títulos de los warnings agrupados
+                                    unitGroupedWarnings.forEach(group => {
+                                        group.title = `Unidad ${index + 1}: ${group.title}`;
+                                    });
+                                    groupedWarnings = groupedWarnings.concat(unitGroupedWarnings);
                                 });
                             }
                         }
@@ -1009,8 +1138,30 @@
                         }
                     });
                 }
+                
+                // 5. NUEVA CORRECCIÓN: Corregir caracteristicas con valor obligatorio (asignar valor 0)
+                if (Array.isArray(data.caracteristicas)) {
+                    // Necesitamos un mapa para buscar las características por nombre rápidamente
+                    const existingCharMap = new Map();
+                    data.caracteristicas.forEach(c => {
+                        if (c.nombre) {
+                            existingCharMap.set(c.nombre, c);
+                        }
+                    });
 
-                // 5. Corregir precios[].moneda (si está vacío)
+                    MANDATORY_VALUE_CHARACTERISTICS.forEach(requiredName => {
+                        const char = existingCharMap.get(requiredName);
+                        
+                        // Si el campo EXISTE pero tiene valor vacío, lo corregimos
+                        if (char && isValueEmpty(char.valor)) {
+                            char.valor = "0";
+                        }
+                        // Si el campo NO EXISTE, la corrección automática no lo puede crear.
+                    });
+                }
+
+
+                // 6. Corregir precios[].moneda (si está vacío)
                 if (Array.isArray(data.precios)) {
                     data.precios.forEach(p => {
                         if (isValueEmpty(p.moneda)) {
@@ -1020,7 +1171,7 @@
                     });
                 }
 
-                // 6. Aplicar correcciones a unidades si es Desarrollo
+                // 7. Aplicar correcciones a unidades si es Desarrollo
                 const isDevelopment = data.publicacion?.tipoDePublicacion === "Desarrollo" || data.publicacion?.tipoDePublicacion === "DEVELOPMENT";
                 if (isDevelopment && Array.isArray(data.unidades)) {
                     data.unidades.forEach(unit => applyCorrections(unit));
@@ -1034,13 +1185,13 @@
                     const correctedData = applyCorrections(JSON.parse(JSON.stringify(currentParsedData))); // Clonar para modificar
                     
                     // Volver a validar para confirmar que las advertencias desaparecieron
-                    const validationResult = validateJSON(correctedData);
+                    const validationResult = validateJSON(correctedData, false, null, portalSelect.value);
                     
                     if (validationResult.errors.length > 0) {
                          // Esto no debería pasar si las correcciones son correctas, pero es un fallback
                          setStatusMessage('Error: La corrección automática introdujo o no resolvió errores críticos.', 'text-red-600');
                     } else if (validationResult.warnings.length === 0) {
-                        currentParsedData = correctedData; // Sobrescribir con el JSON corregido
+                        currentParsedData = correctedData; // Sobreescribir con el JSON corregido
                         jsonOutput.textContent = JSON.stringify(currentParsedData, null, 2);
                         setStatusMessage('Archivo JSON cargado y validado con éxito. La estructura es correcta.', 'text-green-600');
                         correctWarningsBtn.classList.add('hidden'); // Ocultar el botón
@@ -1063,7 +1214,7 @@
                     
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'archivo_validado.json';
+                    a.download = `archivo_validado_${portalSelect.value}.json`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
