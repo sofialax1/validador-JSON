@@ -250,7 +250,7 @@
             <!-- Selector de Portal -->
             <div class="flex items-center space-x-4">
                 <label for="portal-select" class="text-sm font-medium text-gray-800 dark:text-gray-500">Portal:</label>
-                <select id="portal-select" class="block w-48 py-2 px-3 border border-gray-600 bg-white text-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-100 dark:border-gray-600 dark:text-dark">
+                <select id="portal-select" class="block w-48 py-2 px-3 border border-gray-600 bg-white text-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-100 dark:border-gray-600 dark:text-dark">
                     <option value="" disabled selected>Seleccionar</option>
                     <option value="Urbania">Urbania</option>
                     <option value="Zonaprop">Zonaprop</option>
@@ -261,8 +261,8 @@
             </div>
         </div>
 
-         <p class="text-center text-gray-800 mb-6">Sube (o arrastra) un archivo .json para validar la estructura, tipos de datos y obtener un análisis.</p>
-       
+        <p class="text-center text-gray-800 mb-6">Sube (o arrastra) un archivo .json para validar la estructura, tipos de datos y obtener un análisis.</p>
+        
 
         <!-- Área de Drag and Drop -->
         <div id="drop-area" class="drop-area mb-3">
@@ -649,7 +649,7 @@
             function validateJSON(data, isUnit = false, unitIndex = null) {
                 const errors = [];
                 const warnings = [];
-                const caracteristicasWarnings = [];
+                // const caracteristicasWarnings = []; // SE ELIMINA ESTA AGRUPACIÓN
                 const mandatoryValueWarnings = []; // NUEVO: Caracteristicas con valor obligatorio
                 const multimediaUbicacionWarnings = []; // Agrupación 2
                 const publicacionTipoWarnings = []; // Agrupación 3
@@ -767,25 +767,20 @@
                         }
                     });
 
-                    // 1. Validar CARACTERÍSTICAS OBLIGATORIAS (ERROR: nombre, WARNING: idValor)
+                    // 1. Validar CARACTERÍSTICAS OBLIGATORIAS (ERROR: nombre)
                     data.caracteristicas.forEach((caracteristica, index) => {
                         // ERROR: Nombre obligatorio (Agrupación de Errores)
                         if (!('nombre' in caracteristica) || isValueEmpty(caracteristica.nombre)) {
                             caracteristicasErrors.push(`${prefix}El campo 'nombre' en la característica #${index + 1} es obligatorio y no puede estar vacío.`);
                         }
                         
-                        // WARNING: idValor no obligatorio (Agrupación 1 - Warnings)
-                        if (!('idValor' in caracteristica) || isValueEmpty(caracteristica.idValor)) {
-                             const nombreCaracteristica = caracteristica.nombre || `Sin nombre (Índice ${index + 1})`;
-                             caracteristicasWarnings.push(`${prefix}La característica '${nombreCaracteristica}' no tiene 'idValor'. <span class="correction-text">Corrección</span>: Se asignará '0' como valor por defecto.`);
-                        }
+                        // SE ELIMINA VALIDACIÓN DE idValor AQUÍ
                     });
                     
                     // 2. NUEVA VALIDACIÓN: Características con Valor Obligatorio (Default 0 en 'valor')
                     for (const requiredName of MANDATORY_VALUE_CHARACTERISTICS) {
                         const char = existingCharMap.get(requiredName);
                         
-                        // NOTA: ELIMINACIÓN DE LA PARTE ENTRE PARÉNTESIS
                         if (!char || isValueEmpty(char.valor)) {
                             // Generar la advertencia específica (Mensaje simplificado)
                             mandatoryValueWarnings.push(`${prefix}La característica '${requiredName}' no tiene un valor. <span class="correction-text">Corrección</span>: Se asignará '0' como valor default.`);
@@ -891,14 +886,7 @@
                     });
                 }
                 
-                // 1. Características (idValor)
-                if (caracteristicasWarnings.length > 0) {
-                    groupedWarnings.push({
-                        title: `Características (idValor)`,
-                        items: caracteristicasWarnings,
-                        type: 'warnings'
-                    });
-                }
+                // SE ELIMINA LA AGRUPACIÓN 1: CARACTERÍSTICAS (idValor)
                 
                 // Devolver errores no agrupados, y luego los arrays de objetos agrupados
                 return { errors: errors.concat(groupedErrors), warnings: warnings.concat(groupedWarnings) };
@@ -1260,7 +1248,8 @@
                     data.titulo = data.titulo.substring(0, 100);
                 }
 
-                // 4. Corregir caracteristicas[].idValor (si está vacío)
+                // 4. Corregir caracteristicas[].idValor (si está vacío) -> SE ELIMINA ESTA CORRECCIÓN
+                /*
                 if (Array.isArray(data.caracteristicas)) {
                     data.caracteristicas.forEach(c => {
                         if (isValueEmpty(c.idValor)) {
@@ -1268,6 +1257,7 @@
                         }
                     });
                 }
+                */
                 
                 // 5. NUEVA CORRECCIÓN: Corregir caracteristicas con valor obligatorio (asignar valor 0)
                 if (Array.isArray(data.caracteristicas)) {
