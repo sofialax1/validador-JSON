@@ -387,6 +387,37 @@
                 "MEDIDAS|SUPERFICIE_CUBIERTA", 
                 "MEDIDAS|SUPERFICIE_TOTAL"
             ];
+
+            // MAPA DE SINÓNIMOS (Principal: [Alias1, Alias2, ...])
+            // Actualizado para incluir las variaciones: GARAGE/COCHERA, HABITACIONES/DORMITORIO, MEDIOS_BAÑOS/TOILETTES
+            const CHARACTERISTIC_ALIASES = {
+                // Nombre Principal: [Alias sin prefijo, Alias con prefijo PRINCIPALES]
+                "PRINCIPALES|GARAGE": ["GARAGE", "COCHERA", "PRINCIPALES|COCHERA", "PRINCIPALES|ESTACIONAMIENTO"], 
+                "PRINCIPALES|HABITACIONES": ["HABITACIONES", "DORMITORIO", "PRINCIPALES|DORMITORIOS", "PRINCIPALES|CANTIDAD_DORMITORIOS"], 
+                "PRINCIPALES|MEDIOS_BANOS": ["MEDIOS_BANOS", "TOILETTES", "PRINCIPALES|TOILETTES"], 
+                "MEDIDAS|SUPERFICIE_CUBIERTA": ["SUPERFICIE_CUBIERTA", "MEDIDAS|METROS_CUBIERTOS", "MEDIDAS|SUPERFICIE_PROPIA"], 
+                "MEDIDAS|SUPERFICIE_TOTAL": ["SUPERFICIE_TOTAL", "MEDIDAS|METROS_TOTALES", "MEDIDAS|SUPERFICIE_CUBIERTA_TOTAL"]
+            };
+
+            // Función de ayuda para obtener el nombre principal dado un alias o el nombre principal
+            function getPrincipalName(name) {
+                // Estandarizar la entrada a mayúsculas para mejor coincidencia (asumiendo que los nombres del JSON están en mayúsculas)
+                const upperName = name.toUpperCase();
+                
+                // Si el nombre ya está en la lista de obligatorios, es el principal
+                if (MANDATORY_VALUE_CHARACTERISTICS.includes(upperName)) {
+                    return upperName;
+                }
+                
+                // Buscar si es un alias de alguno
+                for (const principal in CHARACTERISTIC_ALIASES) {
+                    // Si el alias es encontrado, devolvemos el nombre principal
+                    if (CHARACTERISTIC_ALIASES[principal].map(a => a.toUpperCase()).includes(upperName)) {
+                        return principal;
+                    }
+                }
+                return null; // No es una característica obligatoria ni un alias conocido
+            }
             // ----------------------------------------------------------------------
 
 
@@ -760,32 +791,61 @@
                 
                 // Validar caracteristicas (Agrupación 1 - Warnings y Errores)
                 if (data.caracteristicas && Array.isArray(data.caracteristicas)) {
-                    const existingCharMap = new Map();
-                    data.caracteristicas.forEach(c => {
-                        if (c.nombre) {
-                            existingCharMap.set(c.nombre, c);
-                        }
-                    });
+                    
+                    // Mapa para rastrear qué características obligatorias SÍ se encontraron y si tienen valor
+                    const foundMandatoryChars = new Map(MANDATORY_VALUE_CHARACTERISTICS.map(name => [name, { found: false, hasValue: false, originalName: null }]));
 
-                    // 1. Validar CARACTERÍSTICAS OBLIGATORIAS (ERROR: nombre)
                     data.caracteristicas.forEach((caracteristica, index) => {
                         // ERROR: Nombre obligatorio (Agrupación de Errores)
                         if (!('nombre' in caracteristica) || isValueEmpty(caracteristica.nombre)) {
                             caracteristicasErrors.push(`${prefix}El campo 'nombre' en la característica #${index + 1} es obligatorio y no puede estar vacío.`);
+                            return; // Saltar el resto de la validación para esta característica rota
+                        }
+                        
+                        // 2. VALIDACIÓN DE SINÓNIMOS Y VALOR OBLIGATORIO
+                        const principalName = getPrincipalName(caracteristica.nombre);
+                        
+                        if (principalName) {
+                            // Encontró una característica obligatoria (principal o sinónimo)
+                            const charInfo = foundMandatoryChars.get(principalName);
+                            if (charInfo) {
+                                charInfo.found = true;
+                                charInfo.originalName = caracteristica.nombre;
+                                // Una característica se considera con valor si no está vacía Y no es exactamente "0" (lo que implica un valor manual)
+                                if (!isValueEmpty(caracteristica.valor) && caracteristica.valor !== "0") {
+                                    charInfo.hasValue = true;
+                                }
+                            }
                         }
                         
                         // SE ELIMINA VALIDACIÓN DE idValor AQUÍ
                     });
                     
-                    // 2. NUEVA VALIDACIÓN: Características con Valor Obligatorio (Default 0 en 'valor')
-                    for (const requiredName of MANDATORY_VALUE_CHARACTERISTICS) {
-                        const char = existingCharMap.get(requiredName);
-                        
-                        if (!char || isValueEmpty(char.valor)) {
-                            // Generar la advertencia específica (Mensaje simplificado)
-                            mandatoryValueWarnings.push(`${prefix}La característica '${requiredName}' no tiene un valor. <span class="correction-text">Corrección</span>: Se asignará '0' como valor default.`);
+                    // 3. GENERAR ADVERTENCIAS para las características obligatorias faltantes o sin valor
+                    foundMandatoryChars.forEach((info, principalName) => {
+                        // Si se encontró con un valor válido (no vacío y no "0"), no hacemos nada.
+                        if (info.found && info.hasValue) {
+                            return;
                         }
-                    }
+                        
+                        // Generamos la advertencia si:
+                        // A) Está ausente (info.found === false)
+                        // B) Está presente (info.found === true) pero con valor vacío o "0" (info.hasValue === false)
+                        let message = "";
+                        let correctionAction = "Se asignará '0' como valor default.";
+
+                        if (info.found) {
+                            // Si se encontró, pero le falta el valor.
+                            message = `La característica '${info.originalName}' (alias de '${principalName}') fue encontrada, pero su campo 'valor' está vacío o es '0'.`;
+                            // Usamos el nombre original en el mensaje, pero la corrección cambiará el nombre al principal.
+                        } else {
+                            // No se encontró la característica, la crearemos con el nombre principal.
+                            message = `La característica obligatoria '${principalName}' no fue encontrada o está mal escrita.`;
+                            correctionAction = "Se creará con el nombre principal y valor '0'.";
+                        }
+                        
+                        mandatoryValueWarnings.push(`${prefix}${message} <span class="correction-text">Corrección</span>: ${correctionAction}`);
+                    });
 
                 }
 
@@ -1226,6 +1286,7 @@
 
             // --- Lógica de Corregir Advertencias (Punto 1b) ---
             const applyCorrections = (data) => {
+                
                 // 1. Corregir publicador.emailAsesor (si está vacío)
                 if (data.publicador && isValueEmpty(data.publicador.emailAsesor)) {
                     data.publicador.emailAsesor = "Administrador";
@@ -1249,35 +1310,65 @@
                 }
 
                 // 4. Corregir caracteristicas[].idValor (si está vacío) -> SE ELIMINA ESTA CORRECCIÓN
-                /*
-                if (Array.isArray(data.caracteristicas)) {
-                    data.caracteristicas.forEach(c => {
-                        if (isValueEmpty(c.idValor)) {
-                            c.idValor = "0";
-                        }
-                    });
-                }
-                */
-                
-                // 5. NUEVA CORRECCIÓN: Corregir caracteristicas con valor obligatorio (asignar valor 0)
-                if (Array.isArray(data.caracteristicas)) {
-                    // Necesitamos un mapa para buscar las características por nombre rápidamente
-                    const existingCharMap = new Map();
-                    data.caracteristicas.forEach(c => {
-                        if (c.nombre) {
-                            existingCharMap.set(c.nombre, c);
-                        }
-                    });
 
+                // 5. CORRECCIÓN PRINCIPAL: Características con valor obligatorio (asignar valor 0 y normalizar nombre)
+                if (Array.isArray(data.caracteristicas)) {
+                    
+                    // A. Crear un mapa para rastrear la existencia de las características obligatorias por su nombre PRINCIPAL
+                    const existingCharMap = new Map();
+                    const newCharacteristics = [];
+
+                    // Llenar el mapa y construir la nueva lista (para reemplazar o modificar)
+                    // Usamos una copia para evitar mutar el array original durante la iteración
+                    const originalCharacteristics = [...data.caracteristicas];
+
+                    originalCharacteristics.forEach(c => {
+                        if (c.nombre) {
+                            const principalName = getPrincipalName(c.nombre);
+                            
+                            if (principalName) {
+                                // Si es obligatoria (principal o alias), la guardamos bajo su nombre principal
+                                // Sobreescribe si hay duplicados, lo cual es manejado aquí como la última aparición.
+                                existingCharMap.set(principalName, c);
+                            } else {
+                                // Si no es obligatoria, simplemente la mantenemos
+                                newCharacteristics.push(c);
+                            }
+                        } else {
+                            // Si la característica no tiene nombre, la descartamos ya que es un error de estructura
+                        }
+                    });
+                    
+                    // B. Iterar sobre la lista de características obligatorias para aplicar correcciones o crearlas
                     MANDATORY_VALUE_CHARACTERISTICS.forEach(requiredName => {
                         const char = existingCharMap.get(requiredName);
                         
-                        // Si el campo EXISTE pero tiene valor vacío, lo corregimos
-                        if (char && isValueEmpty(char.valor)) {
-                            char.valor = "0";
+                        if (char) {
+                            // Caso 1: La característica OBLIGATORIA fue encontrada (como principal o alias)
+                            
+                            // Normalizar el nombre al principal (esto corrige si se usó un alias)
+                            char.nombre = requiredName;
+                            
+                            // Asignar "0" si está vacío (esto corrige si el valor estaba vacío)
+                            if (isValueEmpty(char.valor) || char.valor === "0") {
+                                char.valor = "0";
+                            }
+                            
+                            // Lo añadimos a la lista de características corregidas
+                            newCharacteristics.push(char);
+
+                        } else {
+                            // Caso 2: La característica OBLIGATORIA no fue encontrada (hay que crearla)
+                            newCharacteristics.push({
+                                nombre: requiredName,
+                                valor: "0",
+                                idValor: "0" // Asignar 0 por defecto a idValor también, ya que es la práctica común
+                            });
                         }
-                        // Si el campo NO EXISTE, la corrección automática no lo puede crear.
                     });
+                    
+                    // C. Reemplazar el array de características en los datos
+                    data.caracteristicas = newCharacteristics;
                 }
 
 
