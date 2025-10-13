@@ -310,7 +310,7 @@
 
 
         <div class="bg-gray-50 p-4 rounded-lg">
-            <h2 class="text-lg font-semibold text-black mb-2 dark:text-gray600">Contenido del Archivo:</h2>
+            <h2 class="text-lg font-semibold text-black mb-2 dark:text-gray-600">Contenido del Archivo:</h2>
             <pre id="json-output"></pre>
         </div>
     </div>
@@ -583,22 +583,40 @@
             // Función para renderizar el desglose de WARNINGS
             function renderGroupedWarnings(groupedWarnings) {
                 let html = '';
+                // Obtener el portal seleccionado para la lógica condicional
+                const selectedPortal = portalSelect.value;
+                const isZonaprop = selectedPortal === "Zonaprop";
+                const linkUrl = isZonaprop
+                    ? "https://api-zp-open.navent.com/#/Cat%C3%A1logo/get_v1_tipopropiedades__idtipopropiedad__caracteristicas"
+                    : "https://api-rela-open.navent.com/#!/catalogo/caracteristicasPorTipoUsingGET_7";
+                const linkText = "Vemos que algunas de las características no son correctas, por favor verificarlas aquí:";
+                const linkHtml = `<p class="mt-2 mb-4 text-black mb-6 dark:text-gray-600">${linkText} <a href="${linkUrl}" target="_blank" class="text-blue-600 hover:underline font-bold">${isZonaprop ? 'API Zonaprop' : 'Caracteristicas API'}</a></p>`;
+
+
                 groupedWarnings.forEach((group, index) => {
                     const listId = `warning-list-${index}`;
                     const chevronId = `chevron-${index}`;
+                    const isMandatoryCharGroup = group.title.includes("Características con Valor Obligatorio");
+
+                    let listContent = group.items.map(item => `<li>${item}</li>`).join('');
+
+                    // Inyectar el mensaje de documentación *dentro* del listado de advertencias de características
+                    if (isMandatoryCharGroup) {
+                        listContent = linkHtml + `<ul class="warnings">${listContent}</ul>`;
+                    } else {
+                        listContent = `<ul class="warnings">${listContent}</ul>`;
+                    }
                     
                     html += `
                         <div class="border-t border-yellow-200 dark:border-yellow-800">
                             <div class="warning-group-title" role="button" aria-expanded="false" aria-controls="${listId}" data-target="#${listId}" data-chevron="#${chevronId}">
-                                <span>Advertencias Agrupadas: ${group.title}</span>
+                                <span>${group.title}</span>
                                 <svg id="${chevronId}" class="chevron w-4 h-4 text-yellow-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10l-3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                             <div id="${listId}" class="warning-list">
-                                <ul class="warnings">
-                                    ${group.items.map(item => `<li>${item}</li>`).join('')}
-                                </ul>
+                                ${listContent}
                             </div>
                         </div>
                     `;
@@ -1207,7 +1225,11 @@
                             
                             // 2. Mostrar Advertencias
                             if (generalWarnings.length > 0 || groupedWarnings.length > 0) {
+                                
+                                // Iniciar el warning box
                                 message += '<div class="warning-box">';
+                                
+                                // Título general de advertencias
                                 message += '<span class="warning-title">Se encontraron las siguientes advertencias</span>:<br>';
                                 
                                 // Advertencias Generales (no agrupadas)
