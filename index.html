@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Validador de JSON</title>
-    <!-- Incluyendo Tailwind CSS para un estilo moderno -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -12,56 +11,51 @@
             background-color: #f3f4f6;
             transition: background-color 0.3s, color 0.3s;
         }
-        /* Estilos base del modo noche */
         .dark {
             background-color: #121212;
-            color: #e0e0e0; /* Color de texto por defecto del body en modo noche */
+            color: #e0e0e0;
         }
         .dark .bg-white {
             background-color: #1e1e1e;
         }
         .dark .bg-gray-50 {
-            background-color: #2c2c2c; /* Oscurecer el bloque de código en modo noche */
+            background-color: #2c2c2c;
         }
         
-        /* AJUSTE CLAVE: Permite que el contenido del JSON salte de línea */
         #json-output {
-            white-space: pre-wrap; /* Mantiene formato pero permite salto de línea */
-            word-wrap: break-word; /* Rompe palabras largas */
-            /* Estilos por defecto para el código */
+            white-space: pre-wrap;
+            word-wrap: break-word;
             font-family: monospace;
             font-size: 0.8rem;
-            color: #1f2937; /* Gris oscuro para el código en modo claro */
+            color: #1f2937;
         }
         .dark #json-output {
-            color: #0f9; /* Verde neon para código en modo oscuro */
+            color: #0f9;
         }
 
-        /* Clases de Resaltado de Errores */
         .error-key {
-            color: #dc2626 !important; /* Rojo fuerte */
+            color: #dc2626 !important;
             font-weight: bold;
         }
         
-        /* Ajuste de color de texto forzado para elementos específicos en modo noche */
         .dark .text-black {
-            color: #ffffff; /* Asegura que el título sea blanco en modo oscuro */
+            color: #ffffff;
         }
         .dark .text-gray-900 {
-             color: #ffffff; /* El título del contenido se ve blanco en modo oscuro */
+             color: #ffffff;
         }
         .dark .text-gray-800 {
-            color: #a0a0a0; /* Ajuste para p de descripción en modo oscuro */
+            color: #a0a0a0;
         }
         .dark .text-indigo-700 {
-            color: #8b5cf6; /* Morado claro para el link de subir archivo */
+            color: #8b5cf6;
         }
 
         .dark .drop-area {
             border-color: #444;
         }
         .dark .drop-area.highlight {
-            border-color: #8b5cf6; /* Morado más claro */
+            border-color: #8b5cf6;
             background-color: #2c2c2c;
         }
         .dark .bg-blue-50 {
@@ -72,7 +66,6 @@
             color: #93c5fd;
         }
 
-        /* Estilos de las cajas en modo noche */
         .dark .error-box {
             background-color: #451a1a;
             border: 1px solid #dc2626;
@@ -88,32 +81,29 @@
             background-color: #6d460d;
         }
         
-        /* Ajuste de listas para alineación perfecta */
         ul.errors, ul.warnings {
             list-style-type: disc;
-            /* Alinea el punto fuera del texto y permite que el texto comience uniformemente */
             list-style-position: outside;
-            padding-left: 1.5rem; /* Ajusta la sangría de toda la lista */
-            margin-left: 0.5rem; /* Pequeño margen para separación */
+            padding-left: 1.5rem;
+            margin-left: 0.5rem;
         }
         ul.errors {
-            color: #dc2626; /* Color de texto del error */
+            color: #dc2626;
         }
         ul.warnings {
-            color: #f59e0b; /* Color de texto de la advertencia */
+            color: #f59e0b;
         }
         
-        /* Nuevas clases para enmarcar errores y advertencias */
         .error-box {
-            background-color: #fef2f2; /* red-50 */
-            border: 1px solid #fca5a5; /* red-300 */
+            background-color: #fef2f2;
+            border: 1px solid #fca5a5;
             padding: 1rem;
             border-radius: 0.5rem;
             margin-bottom: 1rem;
         }
         .warning-box {
-            background-color: #fffbeb; /* yellow-50 */
-            border: 1px solid #fcd34d; /* yellow-300 */
+            background-color: #fffbeb;
+            border: 1px solid #fcd34d;
             padding: 1rem;
             border-radius: 0.5rem;
             margin-bottom: 1rem;
@@ -131,21 +121,20 @@
             border-color: #4f46e5;
             background-color: #eef2ff;
         }
-        /* Clases de diseño específicas para los títulos de mensajes */
         .error-title {
             font-weight: bold;
-            color: #dc2626; /* Rojo más fuerte de Tailwind (red-600) */
+            color: #dc2626;
         }
         .warning-title {
             font-weight: bold;
-            color: #f59e0b; /* Amarillo/Ámbar de Tailwind (amber-500) */
+            color: #f59e0b;
         }
         .correction-text {
             font-weight: bold;
         }
         .warning-group-title {
             font-weight: bold;
-            color: #ca8a04; /* Ámbar oscuro */
+            color: #ca8a04;
             padding: 8px 0;
             cursor: pointer;
             display: flex;
@@ -153,12 +142,11 @@
             align-items: center;
         }
         .warning-group-title:hover {
-            background-color: #fef3c7; /* Color de fondo ligero al pasar el mouse */
+            background-color: #fef3c7;
         }
-        /* Clases de diseño específicas para títulos de error agrupados */
         .error-group-title {
             font-weight: bold;
-            color: #b91c1c; /* Rojo oscuro */
+            color: #b91c1c;
             padding: 8px 0;
             cursor: pointer;
             display: flex;
@@ -166,7 +154,7 @@
             align-items: center;
         }
         .error-group-title:hover {
-            background-color: #fee2e2; /* Color de fondo ligero al pasar el mouse */
+            background-color: #fee2e2;
         }
 
         .warning-list, .error-list {
@@ -176,7 +164,7 @@
             padding: 0 0;
         }
         .warning-list.open, .error-list.open {
-            max-height: 500px; /* Suficientemente grande para contener la lista */
+            max-height: 500px;
             padding-bottom: 1rem;
         }
         .chevron {
@@ -186,7 +174,6 @@
             transform: rotate(90deg);
         }
 
-        /* Estilos del Switch de Modo Oscuro */
         .toggle-checkbox:checked {
             right: 0;
             border-color: #6875F5;
@@ -198,35 +185,33 @@
             transform: translateX(100%);
         }
 
-        /* Nuevas clases para los botones */
         .analyze-btn {
-            background-color: #4f46e5; /* Indigo-600 */
+            background-color: #4f46e5;
             color: white;
             border: 1px solid #4f46e5;
         }
         .analyze-btn:hover {
-            background-color: #4338ca; /* Indigo-700 */
+            background-color: #4338ca;
         }
         .reset-btn {
-            background-color: #ffffff; /* Blanco */
-            color: #4f46e5; /* Indigo-600 */
-            border: 1px solid #4f46e5; /* Indigo-600 */
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Transición para modo oscuro */
+            background-color: #ffffff;
+            color: #4f46e5;
+            border: 1px solid #4f46e5;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
         .reset-btn:hover {
-            background-color: #f3f4f6; /* Gray-100 */
-            color: #4338ca; /* Indigo-700 */
+            background-color: #f3f4f6;
+            color: #4338ca;
             border-color: #4338ca;
         }
         
-        /* Estilos específicos del modo oscuro para el botón de Reiniciar */
         .dark .reset-btn {
-            background-color: #2c2c2c; /* Fondo oscuro */
-            color: #93c5fd; /* Azul claro para el texto */
-            border-color: #3b82f6; /* Azul claro para el borde */
+            background-color: #2c2c2c;
+            color: #93c5fd;
+            border-color: #3b82f6;
         }
         .dark .reset-btn:hover {
-            background-color: #3f3f46; /* Gris más oscuro al pasar el ratón */
+            background-color: #3f3f46;
             color: #6366f1;
             border-color: #6366f1;
         }
@@ -234,7 +219,6 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-6">
     <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-3xl relative">
-        <!-- Switch de Modo Oscuro -->
         <div class="absolute top-4 right-4 flex items-center space-x-2">
             <span class="text-sm text-gray-500 dark:text-gray-400">Modo Oscuro</span>
             <input type="checkbox" id="dark-mode-toggle" class="hidden toggle-checkbox">
@@ -245,9 +229,7 @@
 
         <h1 class="text-3xl font-bold text-center text-black mb-4">Validador de JSON</h1>
         
-        <!-- Contenedor de Portal -->
         <div class="flex justify-start items-center mb-6">
-            <!-- Selector de Portal -->
             <div class="flex items-center space-x-4">
                 <label for="portal-select" class="text-sm font-medium text-gray-800 dark:text-gray-500">Portal:</label>
                 <select id="portal-select" class="block w-48 py-2 px-3 border border-gray-600 bg-white text-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-100 dark:border-gray-600 dark:text-dark">
@@ -264,9 +246,7 @@
         <p class="text-center text-gray-800 mb-6">Sube (o arrastra) un archivo .json para validar la estructura, tipos de datos y obtener un análisis.</p>
         
 
-        <!-- Área de Drag and Drop -->
         <div id="drop-area" class="drop-area mb-3">
-            <!-- Contenido Dinámico aquí -->
             <div id="file-name-display" class="text-sm font-medium text-gray-600 dark:text-gray-400">
                 <p class="text-gray-500 dark:text-gray-400">Arrastra y suelta el archivo JSON aquí, o</p>
             </div>
@@ -276,13 +256,10 @@
             <input type="file" id="json-file-input" accept=".json" class="hidden">
         </div>
         
-        <!-- Botones de Acción de Carga y Reinicio (Nueva posición y centrado) -->
         <div class="flex justify-center space-x-3 mb-6">
-            <!-- Botón Analizar Archivo -->
             <button id="analyze-button" class="analyze-btn text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-indigo-700 transition duration-150 flex items-center justify-center text-sm">
                 Analizar Archivo
             </button>
-            <!-- Botón de Reinicio -->
             <button id="reset-button" class="reset-btn text-indigo-600 font-bold py-2 px-4 rounded-full shadow-md hover:bg-gray-100 transition duration-150 flex items-center justify-center text-sm">
                 Reiniciar
             </button>
@@ -290,13 +267,11 @@
         
         <div id="status-message" class="text-center font-medium mb-4 text-sm"></div>
 
-        <!-- Resumen Ejecutivo -->
         <div id="summary-section" class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-6 hidden">
             <h2 class="text-lg font-semibold text-blue-800 mb-2">Resumen Ejecutivo</h2>
             <div id="analysis-summary" class="text-sm text-blue-700"></div>
         </div>
 
-        <!-- Contenedor de Botones de Acción (Corregir y Descargar) -->
         <div id="action-buttons" class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-3 mb-6 hidden">
             <button id="correct-warnings-btn" class="bg-yellow-500 text-white font-bold py-2 px-4 rounded-full shadow-md hover:bg-yellow-600 transition duration-150 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2300/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 102 0V7a1 1 0 10-2 0v3zm0 4a1 1 0 102 0v-1a1 1 0 10-2 0v1z" clip-rule="evenodd" /></svg>
@@ -327,21 +302,19 @@
             const correctWarningsBtn = document.getElementById('correct-warnings-btn');
             const downloadJsonBtn = document.getElementById('download-json-btn');
             const darkModeToggle = document.getElementById('dark-mode-toggle');
-            const fileNameDisplay = document.getElementById('file-name-display'); // Nuevo elemento
-            const portalSelect = document.getElementById('portal-select'); // Selector de portal
-            const resetButton = document.getElementById('reset-button'); // Botón de reinicio
-            const analyzeButton = document.getElementById('analyze-button'); // Botón de analizar
+            const fileNameDisplay = document.getElementById('file-name-display');
+            const portalSelect = document.getElementById('portal-select');
+            const resetButton = document.getElementById('reset-button');
+            const analyzeButton = document.getElementById('analyze-button');
 
-            let currentParsedData = null; // Almacena el JSON válido para corrección/descarga
-            let currentFile = null; // Almacena el archivo actual
+            let currentParsedData = null;
+            let currentFile = null;
 
             
-            // Texto de instrucción inicial
             const initialDropText = '<p class="text-gray-500 dark:text-gray-400">Arrastra y suelta el archivo JSON aquí, o</p>';
             
-            // --- CONSTANTES DE VALIDACIÓN ---
             
-            // Tipos de propiedad permitidos por portal (CLASIFICADOS)
+            
             const PORTAL_ALLOWED_TYPES = {
                 "Zonaprop": [
                     "8", "2005", "10", "45", "7", "99", "32", "38", "5", "4", "26", "2", "2000", "1", "2001", "11", "14"
@@ -360,26 +333,24 @@
                 ]
             };
 
-            // Tipos de propiedad permitidos por portal (EMPRENDIMIENTOS/DESARROLLO)
             const PORTAL_ALLOWED_DEVELOPMENT_TYPES = {
                 "Zonaprop": [
-                    "33", "34" // Emprendimiento horizontal, Emprendimiento vertical
+                    "33", "34"
                 ],
                 "Urbania": [
-                    "33", "34" // Proyecto horizontal, Proyecto vertical
+                    "33", "34"
                 ],
                 "Inmuebles24": [
-                    "33", "34" // Desarrollo horizontal, Desarrollo vertical
+                    "33", "34"
                 ],
                 "Compreoalquile": [
-                    "33", "34" // Proyecto de casas, Proyecto de apartamentos
+                    "33", "34"
                 ], 
                 "Plusvalia": [
-                    "33", "34" // Proyecto horizontal, Proyecto vertical
+                    "33", "34"
                 ],
             };
 
-            // Características con valor obligatorio (DEFAULT 0 en el campo 'valor')
             const MANDATORY_VALUE_CHARACTERISTICS = [
                 "PRINCIPALES|GARAGE", 
                 "PRINCIPALES|HABITACIONES", 
@@ -388,10 +359,7 @@
                 "MEDIDAS|SUPERFICIE_TOTAL"
             ];
 
-            // MAPA DE SINÓNIMOS (Principal: [Alias1, Alias2, ...])
-            // Actualizado para incluir las variaciones: GARAGE/COCHERA, HABITACIONES/DORMITORIO, MEDIOS_BAÑOS/TOILETTES
             const CHARACTERISTIC_ALIASES = {
-                // Nombre Principal: [Alias sin prefijo, Alias con prefijo PRINCIPALES]
                 "PRINCIPALES|GARAGE": ["GARAGE", "COCHERA", "PRINCIPALES|COCHERA", "PRINCIPALES|ESTACIONAMIENTO"], 
                 "PRINCIPALES|HABITACIONES": ["HABITACIONES", "DORMITORIO", "PRINCIPALES|DORMITORIOS", "PRINCIPALES|CANTIDAD_DORMITORIOS"], 
                 "PRINCIPALES|MEDIOS_BANOS": ["MEDIOS_BANOS", "TOILETTES", "PRINCIPALES|TOILETTES"], 
@@ -399,29 +367,21 @@
                 "MEDIDAS|SUPERFICIE_TOTAL": ["SUPERFICIE_TOTAL", "MEDIDAS|METROS_TOTALES", "MEDIDAS|SUPERFICIE_CUBIERTA_TOTAL"]
             };
 
-            // Función de ayuda para obtener el nombre principal dado un alias o el nombre principal
             function getPrincipalName(name) {
-                // Estandarizar la entrada a mayúsculas para mejor coincidencia (asumiendo que los nombres del JSON están en mayúsculas)
                 const upperName = name.toUpperCase();
                 
-                // Si el nombre ya está en la lista de obligatorios, es el principal
                 if (MANDATORY_VALUE_CHARACTERISTICS.includes(upperName)) {
                     return upperName;
                 }
                 
-                // Buscar si es un alias de alguno
                 for (const principal in CHARACTERISTIC_ALIASES) {
-                    // Si el alias es encontrado, devolvemos el nombre principal
                     if (CHARACTERISTIC_ALIASES[principal].map(a => a.toUpperCase()).includes(upperName)) {
                         return principal;
                     }
                 }
-                return null; // No es una característica obligatoria ni un alias conocido
+                return null;
             }
-            // ----------------------------------------------------------------------
-
-
-            // --- Funciones Auxiliares (Declaraciones para asegurar Hoisting) ---
+            
 
             function isValueEmpty(value) {
                 return value === null || value === undefined || (typeof value === 'string' && value.trim() === '');
@@ -432,14 +392,12 @@
                 statusMessage.className = `text-center font-medium mb-4 text-sm ${colorClass}`;
             }
 
-            // Función de ayuda para determinar si un aviso es Desarrollo
             function isDevelopmentAviso(data) {
                 const isDevelopmentByPubType = data.publicacion?.tipoDePublicacion === "Desarrollo" || data.publicacion?.tipoDePublicacion === "DEVELOPMENT";
                 const hasUnits = Array.isArray(data.unidades) && data.unidades.length > 0;
                 return isDevelopmentByPubType || hasUnits; 
             }
 
-            // Función de ayuda para calcular el resumen (Punto 3a)
             function calculateSummary(data) {
                 const isDevelopment = isDevelopmentAviso(data);
                 
@@ -470,26 +428,19 @@
                 return summary;
             }
 
-            // --- FUNCIÓN NUEVA: Extrae los nombres de las claves con errores ---
             function extractErrorKeys(errors) {
                 const keys = [];
-                // Regex para capturar nombres de campos en diferentes formatos de mensajes de error
                 const regex = /El campo obligatorio '([^']+)'|En el precio #\d+, la clave '([^']+)'|La clave obligatoria '([^']+)' dentro de '([^']+)'/g;
 
                 errors.forEach(msg => {
                     let match;
-                    // Necesitamos reiniciar el regex cada vez que iteramos sobre un mensaje
                     const localRegex = new RegExp(regex); 
                     while ((match = localRegex.exec(msg)) !== null) {
-                        // General key (match[1])
                         if (match[1]) keys.push(match[1]); 
-                        // Price key (match[2])
                         else if (match[2]) keys.push(match[2]);
-                        // Nested key (match[3])
                         else if (match[3]) keys.push(match[3]); 
                     }
                     
-                    // Casos especiales (Arrays vacíos y errores de estructura)
                     if (msg.includes("array 'precios' existe, pero está vacío") || msg.includes("Falta el campo obligatorio de array 'precios'")) {
                         keys.push('precios');
                     }
@@ -509,52 +460,39 @@
                         keys.push('unidades');
                     }
                     if (msg.includes("nombre' en la característica #")) {
-                        keys.push('nombre'); // Se resaltará cualquier clave 'nombre'
+                        keys.push('nombre');
                     }
                     if (msg.includes("idUbicacion' contiene letras minúsculas")) {
                         keys.push('idUbicacion'); 
                     }
-                    // Nuevo caso de error: Tipo de Propiedad no permitido
                     if (msg.includes("tipo de propiedad no es válido")) {
                         keys.push('tipoDePropiedad'); 
                         keys.push('idTipo');
                     }
                 });
                 
-                return [...new Set(keys)]; // Devuelve claves únicas a resaltar
+                return [...new Set(keys)];
             }
 
-            // --- FUNCIÓN NUEVA: Formatea y Resalta el JSON ---
             function highlightJSON(data, errorKeys) {
-                // Definir clases CSS para el resaltado
-                const ERROR_KEY_CLASS = 'error-key'; // Clase CSS definida en <style>
+                const ERROR_KEY_CLASS = 'error-key';
 
-                // 1. Stringify el JSON con indentación
                 let jsonString = JSON.stringify(data, null, 2);
                 
-                // 2. Aplicar el resaltado mediante Regex
-                // Buscamos líneas que contengan las claves problemáticas (dentro de comillas y seguidas de dos puntos)
                 errorKeys.forEach(key => {
-                    // Escapar la clave para usarla en Regex
                     const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                     
-                    // Regex para encontrar la clave dentro de comillas (ej: "descripcion")
-                    // ^(\s*)"key"\s*: (Busca la clave al inicio de una línea con su indentación)
                     const keyRegex = new RegExp(`^(\\s*)"${escapedKey}"\\s*:`, 'gm');
                     
-                    // Reemplazar la clave por su versión con el span de error
                     jsonString = jsonString.replace(keyRegex, (match, p1) => {
-                        // p1 es la indentación
                         const highlightedKey = `<span class="${ERROR_KEY_CLASS}">"${key}"</span>`;
                         return `${p1}${highlightedKey}:`;
                     });
                 });
                 
-                // 3. Devolver como HTML (usando <pre> para mantener formato)
                 return jsonString;
             }
             
-            // Función para renderizar el desglose de ERRORES
             function renderGroupedErrors(groupedErrors) {
                 let html = '';
                 groupedErrors.forEach((group, index) => {
@@ -580,10 +518,8 @@
                 return html;
             }
             
-            // Función para renderizar el desglose de WARNINGS
             function renderGroupedWarnings(groupedWarnings) {
                 let html = '';
-                // Obtener el portal seleccionado para la lógica condicional
                 const selectedPortal = portalSelect.value;
                 const isZonaprop = selectedPortal === "Zonaprop";
                 const linkUrl = isZonaprop
@@ -600,7 +536,6 @@
 
                     let listContent = group.items.map(item => `<li>${item}</li>`).join('');
 
-                    // Inyectar el mensaje de documentación *dentro* del listado de advertencias de características
                     if (isMandatoryCharGroup) {
                         listContent = linkHtml + `<ul class="warnings">${listContent}</ul>`;
                     } else {
@@ -624,7 +559,6 @@
                 return html;
             }
             
-            // Función para inicializar listeners del desglose (ERRORS y WARNINGS)
             function initAccordionListeners() {
                 document.querySelectorAll('.warning-group-title, .error-group-title').forEach(button => {
                     button.addEventListener('click', (e) => {
@@ -633,7 +567,6 @@
                         const targetList = document.querySelector(targetSelector);
                         const chevron = document.querySelector(chevronSelector);
                         
-                        // Cierra o abre el acordeón
                         if (targetList.classList.contains('open')) {
                             targetList.classList.remove('open');
                             button.setAttribute('aria-expanded', 'false');
@@ -647,7 +580,6 @@
                 });
             }
 
-            // --- VALIDACION DE TIPOS ---
             function validateTypes(data, schema, path = '') {
                 const warnings = [];
 
@@ -665,16 +597,15 @@
                                 warnings.push(`El campo '${currentPath}' se esperaba como '${expectedType}' pero se encontró como '${actualType}'.`);
                             } else if (expectedType === 'object' && actualType === 'object' && typeof schema[key] === 'object' && !Array.isArray(schema[key])) {
                                 warnings.push(...validateTypes(data[key], schema[key], currentPath));
-                            } else if (expectedType === 'array' && actualType === 'object' && Array.isArray(data[key])) { // Caso array
+                            } else if (expectedType === 'array' && actualType === 'object' && Array.isArray(data[key])) {
                                 if (data[key].length > 0) {
-                                    const arraySchema = schema[key][0]; // Asume que el esquema de array es para el primer elemento
+                                    const arraySchema = schema[key][0];
                                     if (typeof arraySchema === 'object') {
                                         warnings.push(...validateTypes(data[key][0], arraySchema, currentPath + '[0]'));
                                     }
                                 }
                             }
                         } else if (actualType === 'object' && typeof schema[key] === 'object' && !ArrayOf(schema[key])) {
-                            // Si el esquema es un objeto, seguir recursión
                             warnings.push(...validateTypes(data[key], schema[key], currentPath));
                         } else if (actualType === 'array' && Array.isArray(data[key])) {
                             if (data[key].length > 0) {
@@ -689,32 +620,27 @@
                 return warnings;
             }
             
-            // Función de ayuda para determinar si un valor de esquema es un array, evitando confusiones con Object
             function ArrayOf(val) {
                 return Array.isArray(val) && val.length > 0 && typeof val[0] === 'object';
             }
 
-            // --- VALIDACION PRINCIPAL ---
             function validateJSON(data, isUnit = false, unitIndex = null) {
                 const errors = [];
                 const warnings = [];
-                // const caracteristicasWarnings = []; // SE ELIMINA ESTA AGRUPACIÓN
-                const mandatoryValueWarnings = []; // NUEVO: Caracteristicas con valor obligatorio
-                const multimediaUbicacionWarnings = []; // Agrupación 2
-                const publicacionTipoWarnings = []; // Agrupación 3
+                const mandatoryValueWarnings = [];
+                const multimediaUbicacionWarnings = [];
+                const publicacionTipoWarnings = [];
                 
-                const caracteristicasErrors = []; // Errores agrupados de características
-                const preciosErrors = []; // Errores agrupados de precios
+                const caracteristicasErrors = [];
+                const preciosErrors = [];
 
                 const prefix = isUnit ? `Unidad ${unitIndex + 1}: ` : '';
 
-                // Obtener el portal seleccionado para futuras validaciones condicionales
                 const selectedPortal = portalSelect.value;
                 if (!selectedPortal || selectedPortal === 'Seleccionar') {
                     errors.push("Debe seleccionar un Portal para validar las reglas específicas.");
                 }
                 
-                // Determinar si es un desarrollo para aplicar el conjunto correcto de IDs
                 const isDevelopment = isDevelopmentAviso(data);
                 const allowedTypesMap = isDevelopment ? PORTAL_ALLOWED_DEVELOPMENT_TYPES : PORTAL_ALLOWED_TYPES;
 
@@ -727,9 +653,7 @@
                     "codigoAviso",
                 ];
 
-                // Validar campos obligatorios de nivel superior (Errores No Agrupados)
                 for (const key of requiredKeys) {
-                    // Aquí solo chequeamos los campos simples
                     if (key !== 'precios' && key !== 'tipoDePropiedad' && key !== 'localizacion' && key !== 'publicador') {
                         if (!(key in data) || isValueEmpty(data[key])) {
                             errors.push(`${prefix}El campo obligatorio '${key}' no existe o está vacío.`);
@@ -737,7 +661,6 @@
                     }
                 }
                 
-                // VALIDACIÓN DE TÍTULO (Mover a WARNINGS)
                 if (!(data.titulo) || isValueEmpty(data.titulo)) {
                      publicacionTipoWarnings.push(`${prefix}El campo 'titulo' no existe o está vacío. El aviso podría aparecer sin título.`);
                 } else if (data.titulo && data.titulo.length > 100) {
@@ -745,14 +668,12 @@
                 }
 
 
-                // Validar campos anidados (Errores No Agrupados)
                 if (data.tipoDePropiedad) {
                     const idTipo = data.tipoDePropiedad.idTipo;
                     
                     if (!('idTipo' in data.tipoDePropiedad) || isValueEmpty(idTipo)) {
                         errors.push(`${prefix}La clave obligatoria 'idTipo' dentro de 'tipoDePropiedad' no existe o está vacía.`);
                     } else if (selectedPortal && allowedTypesMap[selectedPortal]) {
-                        // NUEVA VALIDACIÓN: Tipo de Propiedad (o Desarrollo) permitido por Portal
                         const allowedTypes = allowedTypesMap[selectedPortal].map(String); 
                         
                         if (allowedTypes.length > 0 && !allowedTypes.includes(String(idTipo))) {
@@ -769,7 +690,6 @@
                     const hasIdUbicacion = 'idUbicacion' in data.localizacion && !isValueEmpty(data.localizacion.idUbicacion);
                     const idUbicacionValue = data.localizacion.idUbicacion || '';
 
-                    // NUEVA VALIDACIÓN: idUbicacion no debe contener minúsculas
                     if (hasIdUbicacion && /[a-z]/.test(idUbicacionValue)) {
                          errors.push(`${prefix}El campo 'idUbicacion' contiene letras minúsculas. El formato de 'idUbicacion' debe ser solo en mayúsculas.`);
                     }
@@ -780,7 +700,6 @@
                         errors.push(`${prefix}El objeto 'localizacion' debe contener 'idUbicacion' o 'latitud' y 'longitud' con valores no vacíos.`);
                     }
                     
-                    // Advertencia: Campo 'direccion' no debe estar vacío (Agrupación 2)
                     if (!('direccion' in data.localizacion) || isValueEmpty(data.localizacion.direccion)) {
                          multimediaUbicacionWarnings.push(`${prefix}El campo 'direccion' en 'localizacion' está vacío. Es importante para la ubicación.`);
                     }
@@ -793,7 +712,6 @@
                     if (!('codigoInmobiliaria' in data.publicador) || isValueEmpty(data.publicador.codigoInmobiliaria)) {
                         errors.push(`${prefix}La clave obligatoria 'codigoInmobiliaria' dentro de 'publicador' no existe o está vacía.`);
                     }
-                    // Advertencia: emailAsesor vacío (Agrupación 3)
                     if (!('emailAsesor' in data.publicador) || isValueEmpty(data.publicador.emailAsesor)) {
                         publicacionTipoWarnings.push(`${prefix}El campo 'emailAsesor' en 'publicador' está vacío. <span class="correction-text">Corrección</span>: Se asignará 'Administrador' por defecto.`);
                     }
@@ -801,63 +719,46 @@
                     errors.push(`${prefix}La clave obligatoria 'publicador' no existe.`);
                 }
 
-                // Advertencia: tipoDePublicacion vacío (Agrupación 3)
                 if (data.publicacion && 'tipoDePublicacion' in data.publicacion && isValueEmpty(data.publicacion.tipoDePublicacion)) {
                     publicacionTipoWarnings.push(`${prefix}El campo 'tipoDePublicacion' está vacío. <span class="correction-text">Corrección</span>: Se asignará por defecto el valor 'SIMPLE'.`);
                 }
                 
                 
-                // Validar caracteristicas (Agrupación 1 - Warnings y Errores)
                 if (data.caracteristicas && Array.isArray(data.caracteristicas)) {
                     
-                    // Mapa para rastrear qué características obligatorias SÍ se encontraron y si tienen valor
                     const foundMandatoryChars = new Map(MANDATORY_VALUE_CHARACTERISTICS.map(name => [name, { found: false, hasValue: false, originalName: null }]));
 
                     data.caracteristicas.forEach((caracteristica, index) => {
-                        // ERROR: Nombre obligatorio (Agrupación de Errores)
                         if (!('nombre' in caracteristica) || isValueEmpty(caracteristica.nombre)) {
                             caracteristicasErrors.push(`${prefix}El campo 'nombre' en la característica #${index + 1} es obligatorio y no puede estar vacío.`);
-                            return; // Saltar el resto de la validación para esta característica rota
+                            return;
                         }
                         
-                        // 2. VALIDACIÓN DE SINÓNIMOS Y VALOR OBLIGATORIO
                         const principalName = getPrincipalName(caracteristica.nombre);
                         
                         if (principalName) {
-                            // Encontró una característica obligatoria (principal o sinónimo)
                             const charInfo = foundMandatoryChars.get(principalName);
                             if (charInfo) {
                                 charInfo.found = true;
                                 charInfo.originalName = caracteristica.nombre;
-                                // Una característica se considera con valor si no está vacía Y no es exactamente "0" (lo que implica un valor manual)
                                 if (!isValueEmpty(caracteristica.valor) && caracteristica.valor !== "0") {
                                     charInfo.hasValue = true;
                                 }
                             }
                         }
-                        
-                        // SE ELIMINA VALIDACIÓN DE idValor AQUÍ
                     });
                     
-                    // 3. GENERAR ADVERTENCIAS para las características obligatorias faltantes o sin valor
                     foundMandatoryChars.forEach((info, principalName) => {
-                        // Si se encontró con un valor válido (no vacío y no "0"), no hacemos nada.
                         if (info.found && info.hasValue) {
                             return;
                         }
                         
-                        // Generamos la advertencia si:
-                        // A) Está ausente (info.found === false)
-                        // B) Está presente (info.found === true) pero con valor vacío o "0" (info.hasValue === false)
                         let message = "";
                         let correctionAction = "Se asignará '0' como valor default.";
 
                         if (info.found) {
-                            // Si se encontró, pero le falta el valor.
                             message = `La característica '${info.originalName}' (alias de '${principalName}') fue encontrada, pero su campo 'valor' está vacío o es '0'.`;
-                            // Usamos el nombre original en el mensaje, pero la corrección cambiará el nombre al principal.
                         } else {
-                            // No se encontró la característica, la crearemos con el nombre principal.
                             message = `La característica obligatoria '${principalName}' no fue encontrada o está mal escrita.`;
                             correctionAction = "Se creará con el nombre principal y valor '0'.";
                         }
@@ -868,9 +769,7 @@
                 }
 
 
-                // Validar campos de arrays de precios (Agrupación de Errores)
                 const prices = data.precios;
-                // Modificación para ser más explícitos si el campo falta o si está vacío
                 if (!('precios' in data)) {
                     errors.push(`${prefix}Falta el campo obligatorio de array 'precios'.`);
                 } else if (!Array.isArray(prices) || prices.length === 0) {
@@ -883,37 +782,29 @@
                         if (!('operacion' in price) || isValueEmpty(price.operacion)) {
                             preciosErrors.push(`${prefix}En el precio #${index + 1}, la clave 'operacion' es obligatoria y está vacía.`);
                         }
-                        // Advertencia para moneda
                         if (!('moneda' in price) || isValueEmpty(price.moneda)) {
                             warnings.push(`${prefix}El campo 'moneda' está vacío. <span class="correction-text">Corrección</span>: Se asignará la moneda default.`);
                         }
                     });
                 }
                 
-                // Validar multimedia (planos e imágenes) (Agrupación 2 - Warnings)
                 if (data.multimedia) {
-                    // Advertencia por falta de planos
                     if (!data.multimedia.planos || (Array.isArray(data.multimedia.planos) && data.multimedia.planos.length === 0)) {
                         multimediaUbicacionWarnings.push(`El aviso no tiene planos.`);
                     }
-                    // Advertencia por falta de imágenes (ya existía)
                     if (!data.multimedia.imagenes || (Array.isArray(data.multimedia.imagenes) && data.multimedia.imagenes.length === 0)) {
                         multimediaUbicacionWarnings.push(`El aviso no cuenta con imágenes.`);
                     }
                 }
                 
-                // VALIDACIÓN EXTRA: Campos obligatorios de Desarrollo (solo si se detecta desarrollo)
                 if (isDevelopment && !isUnit) {
                     if (!('fechaEntrega' in data) || isValueEmpty(data.fechaEntrega)) {
                         errors.push("El tipo de publicación es 'Emprendimiento/Desarrollo' pero el campo 'fechaEntrega' no existe o está vacío.");
                     }
                 }
                 
-                // --- Ensamblar ERRORES Agrupados ---
-                
                 const groupedErrors = [];
                 
-                // Errores de Precios
                 if (preciosErrors.length > 0) {
                     groupedErrors.push({
                         title: `Precios (Monto u Operación)`,
@@ -922,7 +813,6 @@
                     });
                 }
                 
-                // Errores de Características
                 if (caracteristicasErrors.length > 0) {
                     groupedErrors.push({
                         title: `Características (nombre)`,
@@ -932,11 +822,8 @@
                 }
 
 
-                // --- Ensamblar Warnings Agrupados ---
-                
                 const groupedWarnings = [];
                 
-                // 4. Caracteristicas con Valor Obligatorio (NUEVA AGRUPACIÓN)
                 if (mandatoryValueWarnings.length > 0) {
                     groupedWarnings.push({
                         title: `Características con Valor Obligatorio (Asignación Default: 0)`,
@@ -946,7 +833,6 @@
                 }
 
 
-                // 3. Publicación y Tipos
                 if (publicacionTipoWarnings.length > 0) {
                     groupedWarnings.push({
                         title: `Publicación y Tipos (emailAsesor, titulo, tipoDePublicacion)`,
@@ -955,7 +841,6 @@
                     });
                 }
 
-                // 2. Ubicación y Multimedia
                 if (multimediaUbicacionWarnings.length > 0) {
                     groupedWarnings.push({
                         title: `Ubicación y Multimedia (direccion, planos, imágenes)`,
@@ -964,18 +849,13 @@
                     });
                 }
                 
-                // SE ELIMINA LA AGRUPACIÓN 1: CARACTERÍSTICAS (idValor)
-                
-                // Devolver errores no agrupados, y luego los arrays de objetos agrupados
                 return { errors: errors.concat(groupedErrors), warnings: warnings.concat(groupedWarnings) };
             }
 
             
-            // --- Lógica de Modo Oscuro (NUEVO) ---
             const body = document.body;
             const toggleThumb = document.querySelector('.toggle-thumb');
             
-            // Función para aplicar o quitar el modo oscuro
             const toggleDarkMode = (isDark) => {
                 if (isDark) {
                     body.classList.add('dark');
@@ -989,26 +869,21 @@
                 darkModeToggle.checked = isDark;
             };
 
-            // Comprobar la preferencia almacenada al cargar
             const savedTheme = localStorage.getItem('theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             
             if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
                 toggleDarkMode(true);
             } else {
-                // Asegura que el estado inicial sea light si no hay preferencia oscura
                 toggleDarkMode(false);
             }
 
 
-            // Listener del switch
             darkModeToggle.addEventListener('change', () => {
                 toggleDarkMode(darkModeToggle.checked);
             });
-            // --- Fin Lógica de Modo Oscuro ---
+            
 
-
-            // --- Lógica de Drag and Drop (Punto 1c) ---
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 dropArea.addEventListener(eventName, preventDefaults, false);
             });
@@ -1032,14 +907,12 @@
                 const dt = e.dataTransfer;
                 const files = dt.files;
                 if (files.length) {
-                    // Al arrastrar, almacenamos el archivo y actualizamos el display, pero NO analizamos
                     currentFile = files[0];
                     updateFileDisplay(currentFile.name);
                 }
             }
-            // --- Fin Lógica de Drag and Drop ---
+            
 
-            // --- Lógica de Reinicio (ACTUALIZADA) ---
             function resetApplication() {
                 currentParsedData = null;
                 currentFile = null;
@@ -1047,30 +920,24 @@
                 statusMessage.innerHTML = '';
                 summarySection.classList.add('hidden');
                 actionButtons.classList.add('hidden');
-                portalSelect.value = 'Seleccionar'; // Restablecer el desplegable
+                portalSelect.value = 'Seleccionar';
                 
-                // Restablecer el área de drop al texto inicial y ocultar el botón de analizar
                 fileNameDisplay.innerHTML = initialDropText;
                 jsonFileInput.value = ''; 
                 dropArea.classList.remove('highlight');
-                // analyzeButton.classList.remove('hidden'); // Ya no es necesario
             }
 
             resetButton.addEventListener('click', resetApplication);
             
-            // Función para actualizar la visualización del archivo cargado/arrastrado
             function updateFileDisplay(fileName) {
                 fileNameDisplay.innerHTML = `<span class="text-sm font-semibold text-gray-600 dark:text-gray-400">${fileName}</span>`;
-                // analyzeButton.classList.remove('hidden'); // Ya no se oculta/muestra, es siempre visible
             }
-            // --- Fin Lógica de Reinicio ---
+            
 
 
             const processFile = (file) => {
-                // Obtener el portal seleccionado antes de procesar
                 const selectedPortal = portalSelect.value;
                 
-                // Esta función ahora solo se llama al hacer clic en ANALIZAR
                 if (!file) {
                     setStatusMessage('Error: No se ha seleccionado ningún archivo para analizar.', 'text-red-600');
                     return;
@@ -1097,37 +964,33 @@
 
                 reader.onload = (e) => {
                     const fileContent = e.target.result;
-                    currentParsedData = null; // Reiniciar
+                    currentParsedData = null;
                     let allErrors = [];
                     let generalWarnings = [];
-                    let groupedErrors = []; // Almacenará objetos {title, items}
-                    let groupedWarnings = []; // Almacenará objetos {title, items}
-                    let errorKeys = []; // NEW: Almacena las claves a resaltar
+                    let groupedErrors = [];
+                    let groupedWarnings = [];
+                    let errorKeys = [];
 
                     try {
                         let parsedData = JSON.parse(fileContent);
 
                         const primaryResult = validateJSON(parsedData, false, null);
                         
-                        // Define isDevelopment para el procesamiento de unidades
                         const isDevelopment = isDevelopmentAviso(parsedData);
                         const isDevelopmentByPubType = parsedData.publicacion?.tipoDePublicacion === "Desarrollo" || parsedData.publicacion?.tipoDePublicacion === "DEVELOPMENT";
 
 
-                        // NEW WARNING: Si hay unidades pero el tipo de publicación no está marcado como Desarrollo (Inferencia)
                         if (isDevelopmentAviso(parsedData) && !isDevelopmentByPubType) {
                             generalWarnings.push("ADVERTENCIA DE INFERENCIA: El archivo contiene 'unidades', pero el campo 'tipoDePublicacion' no está en 'Desarrollo' o 'DEVELOPMENT'. La validación se ejecutará como Emprendimiento, pero se recomienda corregir el campo 'tipoDePublicacion'.");
                         }
 
 
-                        // Separar los errores y warnings generales de los agrupados
                         allErrors = primaryResult.errors.filter(e => typeof e === 'string');
                         groupedErrors = primaryResult.errors.filter(e => typeof e === 'object');
                         
                         generalWarnings = generalWarnings.concat(primaryResult.warnings.filter(w => typeof w === 'string'));
                         groupedWarnings = groupedWarnings.concat(primaryResult.warnings.filter(w => typeof w === 'object'));
 
-                        // Validación para tipo de publicación 'Desarrollo'
                         if (isDevelopment) {
                             if (!('unidades' in parsedData) || !Array.isArray(parsedData.unidades) || parsedData.unidades.length === 0) {
                                 allErrors.push("El tipo de publicación es 'Emprendimiento/Desarrollo' pero el array 'unidades' está vacío.");
@@ -1138,24 +1001,18 @@
                                 parsedData.unidades.forEach((unit, index) => {
                                     const unitResult = validateJSON(unit, true, index);
                                     
-                                    // Concatenar resultados de unidad
                                     allErrors = allErrors.concat(unitResult.errors.filter(e => typeof e === 'string'));
                                     
-                                    // Concatenar errores agrupados de la unidad
                                     const unitGroupedErrors = unitResult.errors.filter(e => typeof e === 'object');
-                                    // Agregar prefijo de unidad a los títulos de los errores agrupados
                                     unitGroupedErrors.forEach(group => {
                                         group.title = `Unidad ${index + 1}: ${group.title}`;
                                     });
                                     groupedErrors = groupedErrors.concat(unitGroupedErrors);
                                     
-                                    // Concatenar warnings
                                     generalWarnings = generalWarnings.concat(unitResult.warnings.filter(w => typeof w === 'string'));
                                     
-                                    // Concatenar warnings agrupados de la unidad
                                     const unitGroupedWarnings = unitResult.warnings.filter(w => typeof w === 'object');
-                                     // Agregar prefijo de unidad a los títulos de los warnings agrupados
-                                    unitGroupedWarnings.forEach(group => {
+                                     unitGroupedWarnings.forEach(group => {
                                         group.title = `Unidad ${index + 1}: ${group.title}`;
                                     });
                                     groupedWarnings = groupedWarnings.concat(unitGroupedWarnings);
@@ -1163,7 +1020,6 @@
                             }
                         }
                         
-                        // Validación de tipos de datos (Warnings Generales)
                         const typeSchema = {
                             "claveReferencia": "string", "titulo": "string", "descripcion": "string",
                             "estado": "string", "etapaDesarrollo": "string", "fechaEntrega": "string",
@@ -1190,18 +1046,12 @@
                         const typeWarnings = validateTypes(parsedData, typeSchema);
                         generalWarnings = generalWarnings.concat(typeWarnings);
                         
-                        // --- Resaltado de Errores (NUEVO) ---
-                        // 1. Extraer todas las frases de error
                         const allErrorMessages = allErrors.concat(groupedErrors.flatMap(g => g.items));
-                        // 2. Obtener las claves únicas a resaltar en el JSON
                         errorKeys = extractErrorKeys(allErrorMessages);
-                        // 3. Generar JSON resaltado
                         const highlightedJsonString = highlightJSON(parsedData, errorKeys);
-                        jsonOutput.innerHTML = highlightedJsonString; // Usar innerHTML para el resaltado
-                        // --- Fin Resaltado ---
+                        jsonOutput.innerHTML = highlightedJsonString;
 
                         
-                        // --- Reportar y mostrar acciones ---
                         const summaryHTML = calculateSummary(parsedData);
                         analysisSummary.innerHTML = summaryHTML;
                         summarySection.classList.remove('hidden');
@@ -1209,58 +1059,47 @@
                         if (allErrors.length > 0 || groupedErrors.length > 0 || generalWarnings.length > 0 || groupedWarnings.length > 0) {
                             let message = '';
                             
-                            // 1. Mostrar Errores
                             if (allErrors.length > 0 || groupedErrors.length > 0) {
                                 message += '<div class="error-box">';
                                 message += '<span class="error-title">Se encontraron los siguientes errores</span>:<br>';
                                 
-                                // Errores Generales (no agrupados)
                                 if (allErrors.length > 0) {
                                     message += '<ul class="errors">' + allErrors.map(e => `<li>${e}</li>`).join('') + '</ul>';
                                 }
-                                // Errores Agrupados (Desglose)
                                 message += renderGroupedErrors(groupedErrors);
-                                message += '</div>'; // Cerrar error-box
+                                message += '</div>';
                             }
                             
-                            // 2. Mostrar Advertencias
                             if (generalWarnings.length > 0 || groupedWarnings.length > 0) {
                                 
-                                // Iniciar el warning box
                                 message += '<div class="warning-box">';
                                 
-                                // Título general de advertencias
                                 message += '<span class="warning-title">Se encontraron las siguientes advertencias</span>:<br>';
                                 
-                                // Advertencias Generales (no agrupadas)
                                 if (generalWarnings.length > 0) {
                                      message += '<ul class="warnings mb-4">' + generalWarnings.map(w => `<li>${w}</li>`).join('') + '</ul>';
                                 }
                                 
-                                // Advertencias Agrupadas (Desglose)
-                                message += renderGroupedWarnings(groupedWarnings);
-                                message += '</div>'; // Cerrar warning-box
                                 
-                                // Inicializar listeners del accordion
+                                message += renderGroupedWarnings(groupedWarnings);
+                                message += '</div>';
+                                
                                 setTimeout(initAccordionListeners, 0); 
                             }
 
                             if (allErrors.length > 0 || groupedErrors.length > 0) {
-                                setStatusMessage(message, 'text-left'); // Se retira colorClass ya que el color lo maneja el box
-                                // El JSON se muestra arriba gracias a highlightJSON
-                                actionButtons.classList.remove('hidden'); // Mostrar botones (Corregir/Descargar)
-                                correctWarningsBtn.classList.add('hidden'); // Ocultar Corregir si hay errores
-                                downloadJsonBtn.classList.add('hidden'); // Ocultar Descargar si hay errores
+                                setStatusMessage(message, 'text-left');
+                                actionButtons.classList.remove('hidden');
+                                correctWarningsBtn.classList.add('hidden');
+                                downloadJsonBtn.classList.add('hidden');
                             } else {
                                 setStatusMessage(message, 'text-left');
                                 currentParsedData = parsedData;
                                 actionButtons.classList.remove('hidden');
                                 correctWarningsBtn.classList.remove('hidden');
                                 downloadJsonBtn.classList.remove('hidden');
-                                // El JSON ya está en jsonOutput.innerHTML
                             }
                         } else {
-                            // Caso de éxito
                             jsonOutput.textContent = JSON.stringify(parsedData, null, 2);
                             setStatusMessage('Archivo JSON cargado y validado con éxito. La estructura es correcta.', 'text-green-600');
                             currentParsedData = parsedData;
@@ -1280,9 +1119,6 @@
                 reader.readAsText(file);
             };
             
-            // --- EVENT LISTENERS PRINCIPALES ---
-
-            // Listener para cuando se selecciona un archivo (maneja el file input)
             jsonFileInput.addEventListener('change', (event) => {
                 currentFile = event.target.files[0];
                 if (currentFile) {
@@ -1290,14 +1126,11 @@
                 }
             });
             
-            // Listener para el nuevo botón Analizar Archivo
             analyzeButton.addEventListener('click', () => {
-                // Reiniciar el área de output antes de analizar para evitar confusión
                 jsonOutput.textContent = '';
                 summarySection.classList.add('hidden');
                 actionButtons.classList.add('hidden');
                 
-                // Si el archivo no está guardado (caso de click sin drop previo), intentar obtenerlo del input
                 if (!currentFile && jsonFileInput.files.length > 0) {
                      currentFile = jsonFileInput.files[0];
                 }
@@ -1306,42 +1139,31 @@
             });
 
 
-            // --- Lógica de Corregir Advertencias (Punto 1b) ---
             const applyCorrections = (data) => {
                 
-                // 1. Corregir publicador.emailAsesor (si está vacío)
                 if (data.publicador && isValueEmpty(data.publicador.emailAsesor)) {
                     data.publicador.emailAsesor = "Administrador";
                 }
 
-                // 2. Corregir publicacion.tipoDePublicacion (si está vacío)
                 if (data.publicacion && isValueEmpty(data.publicacion.tipoDePublicacion)) {
-                    // Si inferimos que es desarrollo por las unidades, no lo corregimos a SIMPLE aquí
                     const isDevelopmentByUnits = Array.isArray(data.unidades) && data.unidades.length > 0;
                     if (!isDevelopmentByUnits) {
                         data.publicacion.tipoDePublicacion = "SIMPLE";
                     } else {
-                        // Si tiene unidades, pero el campo estaba vacío, lo corregimos a Desarrollo para consistencia futura
                         data.publicacion.tipoDePublicacion = "Desarrollo"; 
                     }
                 }
                 
-                // 3. Corregir titulo (si es > 100 caracteres)
                 if (data.titulo && data.titulo.length > 100) {
                     data.titulo = data.titulo.substring(0, 100);
                 }
 
-                // 4. Corregir caracteristicas[].idValor (si está vacío) -> SE ELIMINA ESTA CORRECCIÓN
 
-                // 5. CORRECCIÓN PRINCIPAL: Características con valor obligatorio (asignar valor 0 y normalizar nombre)
                 if (Array.isArray(data.caracteristicas)) {
                     
-                    // A. Crear un mapa para rastrear la existencia de las características obligatorias por su nombre PRINCIPAL
                     const existingCharMap = new Map();
                     const newCharacteristics = [];
 
-                    // Llenar el mapa y construir la nueva lista (para reemplazar o modificar)
-                    // Usamos una copia para evitar mutar el array original durante la iteración
                     const originalCharacteristics = [...data.caracteristicas];
 
                     originalCharacteristics.forEach(c => {
@@ -1349,62 +1171,48 @@
                             const principalName = getPrincipalName(c.nombre);
                             
                             if (principalName) {
-                                // Si es obligatoria (principal o alias), la guardamos bajo su nombre principal
-                                // Sobreescribe si hay duplicados, lo cual es manejado aquí como la última aparición.
                                 existingCharMap.set(principalName, c);
                             } else {
-                                // Si no es obligatoria, simplemente la mantenemos
                                 newCharacteristics.push(c);
                             }
                         } else {
-                            // Si la característica no tiene nombre, la descartamos ya que es un error de estructura
                         }
                     });
                     
-                    // B. Iterar sobre la lista de características obligatorias para aplicar correcciones o crearlas
                     MANDATORY_VALUE_CHARACTERISTICS.forEach(requiredName => {
                         const char = existingCharMap.get(requiredName);
                         
                         if (char) {
-                            // Caso 1: La característica OBLIGATORIA fue encontrada (como principal o alias)
                             
-                            // Normalizar el nombre al principal (esto corrige si se usó un alias)
                             char.nombre = requiredName;
                             
-                            // Asignar "0" si está vacío (esto corrige si el valor estaba vacío)
                             if (isValueEmpty(char.valor) || char.valor === "0") {
                                 char.valor = "0";
                             }
                             
-                            // Lo añadimos a la lista de características corregidas
                             newCharacteristics.push(char);
 
                         } else {
-                            // Caso 2: La característica OBLIGATORIA no fue encontrada (hay que crearla)
                             newCharacteristics.push({
                                 nombre: requiredName,
                                 valor: "0",
-                                idValor: "0" // Asignar 0 por defecto a idValor también, ya que es la práctica común
+                                idValor: "0"
                             });
                         }
                     });
                     
-                    // C. Reemplazar el array de características en los datos
                     data.caracteristicas = newCharacteristics;
                 }
 
 
-                // 6. Corregir precios[].moneda (si está vacío)
                 if (Array.isArray(data.precios)) {
                     data.precios.forEach(p => {
                         if (isValueEmpty(p.moneda)) {
-                            // Suponemos una moneda por defecto común, ej., 'USD' o 'MXN'
                             p.moneda = "USD"; 
                         }
                     });
                 }
 
-                // 7. Aplicar correcciones a unidades si es Desarrollo
                 const isDevelopment = isDevelopmentAviso(data);
                 if (isDevelopment && Array.isArray(data.unidades)) {
                     data.unidades.forEach(unit => applyCorrections(unit));
@@ -1415,23 +1223,19 @@
 
             correctWarningsBtn.addEventListener('click', () => {
                 if (currentParsedData) {
-                    const correctedData = applyCorrections(JSON.parse(JSON.stringify(currentParsedData))); // Clonar para modificar
+                    const correctedData = applyCorrections(JSON.parse(JSON.stringify(currentParsedData)));
                     
-                    // Volver a validar para confirmar que las advertencias desaparecieron
-                    const validationResult = validateJSON(JSON.parse(JSON.stringify(correctedData)), false, null); // Clonar nuevamente para validar
+                    const validationResult = validateJSON(JSON.parse(JSON.stringify(correctedData)), false, null);
 
                     if (validationResult.errors.length > 0) {
-                         // Esto no debería pasar si las correcciones son correctas, pero es un fallback
                          setStatusMessage('Error: La corrección automática introdujo o no resolvió errores críticos.', 'text-red-600');
                     } else if (validationResult.warnings.length === 0) {
-                        currentParsedData = correctedData; // Sobreescribir con el JSON corregido
+                        currentParsedData = correctedData;
                         jsonOutput.textContent = JSON.stringify(currentParsedData, null, 2);
                         setStatusMessage('Archivo JSON cargado y validado con éxito. La estructura es correcta.', 'text-green-600');
-                        correctWarningsBtn.classList.add('hidden'); // Ocultar el botón
+                        correctWarningsBtn.classList.add('hidden');
                     } else {
-                        // Si quedan advertencias (las que no tienen corrección auto), simplemente actualizar
                         currentParsedData = correctedData;
-                        // Forzar el proceso completo para re-renderizar el JSON resaltado y el nuevo reporte de advertencias
                         processFile(new File([JSON.stringify(currentParsedData)], 'archivo_corregido.json', { type: 'application/json' }));
                         setStatusMessage('Advertencias corregidas. Aún quedan advertencias informativas (sin corrección automática).', 'text-yellow-600');
                     }
@@ -1439,7 +1243,6 @@
             });
 
 
-            // --- Lógica de Descargar JSON (Punto 3c) ---
             downloadJsonBtn.addEventListener('click', () => {
                 if (currentParsedData) {
                     const dataStr = JSON.stringify(currentParsedData, null, 2);
